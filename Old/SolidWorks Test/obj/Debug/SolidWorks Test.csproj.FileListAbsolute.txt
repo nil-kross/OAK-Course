@@ -1,0 +1,14 @@
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\bin\Debug\SolidWorks Test.exe.config
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\bin\Debug\SolidWorks Test.exe
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\bin\Debug\SolidWorks Test.pdb
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\SolidWorks Test.csprojResolveAssemblyReference.cache
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\Interop.SldWorks.dll
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\Interop.SwCommands.dll
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\Interop.SwConst.dll
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\Interop.SWUtilities.dll
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\SolidWorks Test.csproj.ResolveComReference.cache
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\SolidWorks_Test.Properties.Resources.resources
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\SolidWorks Test.csproj.GenerateResource.cache
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\SolidWorks Test.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\SolidWorks Test.exe
+C:\Users\user\Documents\Visual Studio 2017\Projects\Тестовые проекты\SolidWorks Test\SolidWorks Test\obj\Debug\SolidWorks Test.pdb
