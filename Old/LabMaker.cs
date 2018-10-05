@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using SldWorks;
 using SwConst;
 using SwCommands;
-using SWUtilities;
 
 namespace SolidWorks_Test {
 	public static class LabMaker {
@@ -187,9 +186,11 @@ namespace SolidWorks_Test {
 				foreach (Face2 selectedFace in selectedFacesList) {
 					Surface selectedFaceSurface = selectedFace.GetSurface() as Surface;
 
-					if (selectedFaceSurface?.IsPlane() ?? false) {
-						partSideFace = selectedFace;
-					}
+                    if (selectedFaceSurface != null) {
+                        if (selectedFaceSurface.IsPlane()) {
+						    partSideFace = selectedFace;
+					    }
+                    }
 				}
 
 				foreach (Face2 selectedFace in selectedFacesList) {
@@ -265,7 +266,7 @@ namespace SolidWorks_Test {
 								// Выполняем сопряжение:
 								{
 									Int32 statusValue = 0;
-									Mate2 myMate = ((Mate2)(assemblyDocument.AddMate5(0, 1, false, 0.051126624765061614, 0.001, 0.001, 0.001, 0.001, 1.5707963267948966, 0.52359877559830004, 0.52359877559830004, false, false, 0, out statusValue)));
+									Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(0, 1, false, 0.051126624765061614, 0.001, 0.001, 0.001, 0.001, 1.5707963267948966, 0.52359877559830004, 0.52359877559830004, false, out statusValue)));
 										
 									if (statusValue == 1) {
 										if (false) { // DEBUG
@@ -334,7 +335,7 @@ namespace SolidWorks_Test {
 									{
 										Int32 statusValue = 0;
 										Boolean bol2 = ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(selectedFace, null);
-										Mate2 myMate = ((Mate2)(assemblyDocument.AddMate5(1, 1, false, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, 0, out statusValue)));
+										Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(1, 1, false, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, out statusValue)));
 										
 										if (statusValue == 1) {
 											if (false) {
@@ -395,7 +396,7 @@ namespace SolidWorks_Test {
 									{
 										Int32 statusValue = 0;
 										Boolean bol2 = ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(partSideFace, null);
-										Mate2 myMate = ((Mate2)(assemblyDocument.AddMate5(0, 1, false, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, 0, out statusValue)));
+										Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(0, 1, false, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, out statusValue)));
 										
 										if (statusValue == 1) {
 											if (false) {
@@ -494,7 +495,7 @@ namespace SolidWorks_Test {
 
 											{
 												Int32 statusValue = 0;
-												Mate2 myMate = ((Mate2)(assemblyDocument.AddMate5(0, 1, false, 0.051126624765061614, 0.001, 0.001, 0.001, 0.001, 1.5707963267948966, 0.52359877559830004, 0.52359877559830004, false, false, 0, out statusValue)));
+												Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(0, 1, false, 0.051126624765061614, 0.001, 0.001, 0.001, 0.001, 1.5707963267948966, 0.52359877559830004, 0.52359877559830004, false, out statusValue)));
 										
 												if (statusValue == 1) {
 													if (false) { // DEBUG
@@ -518,7 +519,7 @@ namespace SolidWorks_Test {
 
 											{
 												Int32 statusValue = 0;
-												Mate2 myMate = ((Mate2)(assemblyDocument.AddMate5(5, -1, false, (Double)(height / 1000.0), (Double)(height / 1000.0), (Double)(height / 1000.0), 0.001, 0.001, 0, 0.52359877559830004, 0.52359877559830004, false, false, 0, out statusValue)));
+												Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(5, -1, false, (Double)(height / 1000.0), (Double)(height / 1000.0), (Double)(height / 1000.0), 0.001, 0.001, 0, 0.52359877559830004, 0.52359877559830004, false, out statusValue)));
 										
 												if (statusValue == 1) {
 													if (false) { // DEBUG
