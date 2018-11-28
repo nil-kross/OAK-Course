@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2042
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidWorks Test", "Old\SolidWorks Test.csproj", "{1B997F8A-1BED-41CF-8C38-95F8723299CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Course.Library", "Course.Library\Course.Library.csproj", "{500141CC-4645-40BD-BD29-EAAEF6FACE0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Course", "Course\Course.csproj", "{4C6EDD84-6B50-419A-9C9D-BDABA0E69170}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,10 @@ Global
 		{1B997F8A-1BED-41CF-8C38-95F8723299CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B997F8A-1BED-41CF-8C38-95F8723299CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B997F8A-1BED-41CF-8C38-95F8723299CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{500141CC-4645-40BD-BD29-EAAEF6FACE0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{500141CC-4645-40BD-BD29-EAAEF6FACE0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{500141CC-4645-40BD-BD29-EAAEF6FACE0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{500141CC-4645-40BD-BD29-EAAEF6FACE0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C6EDD84-6B50-419A-9C9D-BDABA0E69170}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C6EDD84-6B50-419A-9C9D-BDABA0E69170}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C6EDD84-6B50-419A-9C9D-BDABA0E69170}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C6EDD84-6B50-419A-9C9D-BDABA0E69170}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
