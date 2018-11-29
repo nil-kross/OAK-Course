@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidWorks Test", "Old\SolidWorks Test.csproj", "{1B997F8A-1BED-41CF-8C38-95F8723299CF}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2016
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Credit", "Old\Credit.csproj", "{1B997F8A-1BED-41CF-8C38-95F8723299CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Course", "Course\Course.csproj", "{4C6EDD84-6B50-419A-9C9D-BDABA0E69170}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Course", "New\Course.csproj", "{4C6EDD84-6B50-419A-9C9D-BDABA0E69170}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
