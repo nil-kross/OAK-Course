@@ -11,6 +11,7 @@ namespace Course
     public static class SolidWorksApi
     {
         private static String swApplicationNameString = "SldWorks.Application";
+
         public static SW GetSolidWorks()
         {
             SW solidWorks = null;
@@ -19,7 +20,7 @@ namespace Course
             {
                 solidWorks = (SW)Marshal.GetActiveObject(SolidWorksApi.swApplicationNameString);
             }
-            catch { }
+            catch {}
 
             return solidWorks;
         }

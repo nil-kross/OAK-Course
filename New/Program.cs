@@ -19,7 +19,7 @@ namespace Course
 
                 app.Start();
 
-                Console.WriteLine(" Нажмите клавишу [Escape], чтобы завершить выполнение программы.");
+                Message.Show("Нажмите клавишу [Escape], чтобы завершить выполнение программы.", MessageType.Notification);
                 isDone = Console.ReadKey().Key == ConsoleKey.Escape;
             } 
             while (!isDone);

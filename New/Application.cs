@@ -19,9 +19,11 @@ namespace Course
         {
             this.solidWorks = SolidWorksApi.GetSolidWorks();
 
-            if (this.solidWorks != null)
+            if (this.solidWorks == null)
             {
-                ;
+                Message.Show("Не удалось получить дескриптор приложения SolidWorks!", MessageType.Error);
+                Message.Show("Пожалуйста, запустите приложение SolidWorks.", MessageType.Info);
+                return;
             }
         }
     }
