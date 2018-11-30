@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using SldWorks;
-using SwConst;
-using SwCommands;
+using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 
 namespace SolidWorks_Test {
 	public static class LabMaker {
@@ -17,7 +17,7 @@ namespace SolidWorks_Test {
 				"Locator1.SLDPRT",
 				"Locator7.SLDPRT"
 			};
-			SldWorks.SldWorks solidWorksApplication = null;
+			SldWorks solidWorksApplication = null;
 			String diskString = "G";
 			AssemblyDoc assemblyDocument = null;
 			SelectionMgr selectionManager = null;
@@ -34,7 +34,7 @@ namespace SolidWorks_Test {
 				String errorString = "";
 
 				try {
-					solidWorksApplication = (SldWorks.SldWorks)Marshal.GetActiveObject("SldWorks.Application"); //
+					solidWorksApplication = (SldWorks)Marshal.GetActiveObject("SldWorks.Application"); //
 				} catch (Exception exception) {
 					errorString += exception.Message;
 					isDone = false;
