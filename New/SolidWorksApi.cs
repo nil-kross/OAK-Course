@@ -80,5 +80,19 @@ namespace Course
             
             return selectedObjectsList;
         }
+
+        public static void InsertComponent(String unitFilePathway, SW solidWorks, AssemblyDoc assemblyDocument)
+        {
+            Int32 errorValue = 0;
+            Int32 warningValue = 0;
+            ModelDoc2 modelDocument = null;
+
+            modelDocument = solidWorks.OpenDoc6(unitFilePathway, 1, 1, "", ref errorValue, ref warningValue);
+            if (modelDocument != null)
+            {
+                assemblyDocument.AddComponent(unitFilePathway, 0.0, 0.0, 0.1);
+                modelDocument.Close();
+            }
+        }
     }
 }
