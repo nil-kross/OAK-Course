@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Course {
-    public enum MessageType {
-        Error,
-        Warning,
-        Info,
-        Notification
+    public enum MessageType
+    {
+        Text, // Уведомление о состоянии (для интерактивного режима)
+        Info, // Уведомление о состоянии
+        Warning, // Уведомление о возможном некорректном поведении (для интерактивного режима)
+        Error // Уведомление об ошибке из-за предполагаемого, но некорректного поведения
     }
 
     public static class Message {
@@ -18,15 +19,35 @@ namespace Course {
         static Message() {
             Message.messageTypeColors[MessageType.Error] = ConsoleColor.Red;
             Message.messageTypeColors[MessageType.Warning] = ConsoleColor.Yellow;
-            Message.messageTypeColors[MessageType.Info] = ConsoleColor.Blue;
-            Message.messageTypeColors[MessageType.Notification] = ConsoleColor.Gray;
+            Message.messageTypeColors[MessageType.Info] = ConsoleColor.Green;
+            Message.messageTypeColors[MessageType.Text] = ConsoleColor.Gray;
         }
 
-        public static void Show(String messageText, MessageType? messageType = MessageType.Notification) {
+        public static void Text(String messageText)
+        {
+            Message.Show(messageText, MessageType.Text);
+        }
+
+        public static void Info(String messageText)
+        {
+            Message.Show(messageText, MessageType.Info);
+        }
+        public static void Warning(String messageText)
+        {
+            Message.Show(messageText, MessageType.Warning);
+        }
+
+        public static void Error(String messageText)
+        {
+            Message.Show(messageText, MessageType.Error);
+        }
+
+        private  static void Show(String messageText, MessageType? messageType = MessageType.Text) {
             Message.ShowWithColor(" [", ConsoleColor.White);
             Message.ShowWithColor(DateTime.Now.ToString("HH:mm.ss"), ConsoleColor.DarkGray);
             Message.ShowWithColor("] ", ConsoleColor.White);
             Message.ShowWithColor(messageText + Environment.NewLine, Message.messageTypeColors[messageType.Value]);
+            Journal.Log(messageText);
         }
 
         private static void ShowWithColor(String messageText, ConsoleColor consoleColor) {

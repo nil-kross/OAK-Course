@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SW = SolidWorks.Interop.sldworks.SldWorks;
+using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 
 namespace Course
 {
@@ -20,9 +22,63 @@ namespace Course
             {
                 solidWorks = (SW)Marshal.GetActiveObject(SolidWorksApi.swApplicationNameString);
             }
-            catch {}
+            catch {
+                Message.Error("Не удалось получить дескриптор приложения SolidWorks!");
+            }
 
             return solidWorks;
+        }
+
+        public static Boolean TryGetActiveAssembly(SW solidWorks, AssemblyDoc assemblyDocument, SelectionMgr selectionManager)
+        {
+            var isDone = false;
+
+            if (solidWorks != null) {
+                isDone = true;
+                try
+                {
+                    ModelDoc2 solidWorksDocument = null;
+                    ModelView myModelView = null;
+
+                    solidWorksDocument = ((ModelDoc2)(solidWorks.ActiveDoc));
+                    myModelView = ((ModelView)(solidWorksDocument.ActiveView));
+                    myModelView.FrameState = ((int)(swWindowState_e.swWindowMaximized));
+                    assemblyDocument = ((AssemblyDoc)(solidWorksDocument));
+                    selectionManager = solidWorksDocument.SelectionManager;
+                }
+                catch
+                {
+                    Message.Error("Не удалось получить активную сборку!");
+                    isDone = false;
+                    assemblyDocument = null;
+                    selectionManager = null;
+                }
+            }
+
+            return isDone;
+        }
+
+        public static IList<Object> GetSelectedObjects(SelectionMgr selectionManager)
+        {
+            IList<Object> selectedObjectsList = null;
+
+            if (selectionManager != null)
+            {
+                Int32 selectedObjectsAmount = selectionManager.GetSelectedObjectCount();
+
+                if (selectedObjectsAmount > 0)
+                {
+                    selectedObjectsList = new Object[selectedObjectsAmount];
+                }
+                for (Int32 i = 1; i <= selectedObjectsAmount; i++)
+                {
+                    Object selectedObject = selectionManager.GetSelectedObject(i);
+
+                    selectedObjectsList.Add(selectedObject);
+                }
+            }
+            
+            return selectedObjectsList;
         }
     }
 }
