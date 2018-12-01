@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using SW = SolidWorks.Interop.sldworks.SldWorks;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Course.Debug;
 
 namespace Course
 {

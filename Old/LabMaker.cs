@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using SldWorks;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
