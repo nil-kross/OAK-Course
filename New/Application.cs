@@ -31,10 +31,17 @@ namespace Course
                 AssemblyDoc assemblyDocument = null;
                 SelectionMgr selectionManager = null;
 
-                if (SolidWorksApi.TryGetActiveAssembly(solidWorks, assemblyDocument, selectionManager))
+                if (SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager))
                 {
                     var selectedObjectsList = SolidWorksApi.GetSelectedObjects(selectionManager);
 
+                    if (selectedObjectsList != null) {
+                        foreach (var obj in selectedObjectsList) {
+                            Message.Text(obj.ToString());
+                        }
+                    } else {
+                        Message.Warning("Нет выбранных обьектов!");
+                    }
                 }
                 else
                 {
