@@ -51,16 +51,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\DocumentTypes.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Component\Component.cs" />
-    <Compile Include="Debug\Debug.cs" />
-    <Compile Include="Debug\Journal.cs" />
-    <Compile Include="Debug\Message.cs" />
+    <Compile Include="Component\Part.cs" />
+    <Compile Include="Debuging\Debuger.cs" />
+    <Compile Include="Debuging\Input.cs" />
+    <Compile Include="Debuging\Journal.cs" />
+    <Compile Include="Debuging\Message.cs" />
+    <Compile Include="Debuging\Typewriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Api\SolidWorksApi.cs" />
-    <Compile Include="Units\Finger.cs" />
-    <Compile Include="Units\Unit.cs" />
+    <Compile Include="Component\Finger.cs" />
+    <Compile Include="Component\Unit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,4 +1,5 @@
-﻿using Course.Debug;
+﻿using Course.Api;
+using Course.Debug;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -25,6 +26,7 @@ namespace Course
             if (this.solidWorks == null)
             {
                 Message.Warning("Пожалуйста, запустите приложение SolidWorks.");
+
                 return;
             }
             else
@@ -32,12 +34,18 @@ namespace Course
                 AssemblyDoc assemblyDocument = null;
                 SelectionMgr selectionManager = null;
 
-                do {
-                    if (!SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager)) {
+                if (!SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager)) {
+                    var assemblyPathwayString = @"L:\2 Definitions\ОАК\2\Assembly 2.SLDASM";
+                    
+                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(solidWorks, DocumentTypes.Assembly, assemblyPathwayString);
+
+                    if (assemblyDocument == null) {
                         Message.Info("Создаю новую сборку..");
                         SolidWorksApi.CreateNewAssembly(solidWorks);
                     }
-                } while (assemblyDocument == null);
+                }
+
+                Input.Key("Выберите плоскости:" + System.Environment.NewLine + "[Продолжить]");
 
                 {
                     var selectedObjectsList = SolidWorksApi.GetSelectedObjects(selectionManager);
@@ -45,11 +53,14 @@ namespace Course
                     if (selectedObjectsList != null) {
                         foreach (var obj in selectedObjectsList) {
                             Message.Text(obj.ToString());
+                            Debuger.Show(obj);
                         }
                     } else {
                         Message.Warning("Нет выбранных обьектов!");
                     }
                 }
+
+                SolidWorksApi.CloseAssemblies(this.solidWorks);
             }
         }
     }

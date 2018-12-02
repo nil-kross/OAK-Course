@@ -21,8 +21,7 @@ namespace Course
 
                 app.Start();
 
-                Message.Text("Нажмите клавишу [Escape], чтобы завершить выполнение программы.");
-                isDone = Console.ReadKey().Key == ConsoleKey.Escape;
+                isDone = ConsoleKey.Escape == Input.Key("Нажмите клавишу [Escape], чтобы завершить выполнение программы.");
             } 
             while (!isDone);
             Message.Info("Выполнение программы завершено!");
