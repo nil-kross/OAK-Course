@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Course.Units {
+namespace Course.Component {
     public class Finger : Unit {
-        public override String FileName {
-            get => "Locator1";
-        }
+        public override String FileName => "Locator1";
     }
 }
