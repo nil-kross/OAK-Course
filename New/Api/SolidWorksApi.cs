@@ -8,8 +8,9 @@ using SW = SolidWorks.Interop.sldworks.SldWorks;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Course.Debug;
+using Course.Api;
 
-namespace Course
+namespace Course.Api
 {
     public static class SolidWorksApi
     {
@@ -28,6 +29,23 @@ namespace Course
             }
 
             return solidWorks;
+        }
+        public static ModelDoc2 OpenDocument(SW solidWorks, DocumentTypes documentType, String fileNamePathway) {
+            ModelDoc2 modelDocument = null;
+
+            if (solidWorks != null) {
+                try {
+                    modelDocument = solidWorks.OpenDoc(fileNamePathway, (Int32)documentType);
+                } catch {
+                    Message.Error("Не удалось открыть указанный файл!");
+                }
+            }
+
+            return modelDocument;
+        }
+
+        public static void CloseAssemblies(SW solidWorks) {
+            solidWorks.CloseAllDocuments(true);
         }
 
         public static AssemblyDoc CreateNewAssembly(SW solidWorks) {
