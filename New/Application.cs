@@ -32,7 +32,13 @@ namespace Course
                 AssemblyDoc assemblyDocument = null;
                 SelectionMgr selectionManager = null;
 
-                if (SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager))
+                do {
+                    if (!SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager)) {
+                        Message.Info("Создаю новую сборку..");
+                        SolidWorksApi.CreateNewAssembly(solidWorks);
+                    }
+                } while (assemblyDocument == null);
+
                 {
                     var selectedObjectsList = SolidWorksApi.GetSelectedObjects(selectionManager);
 
@@ -43,10 +49,6 @@ namespace Course
                     } else {
                         Message.Warning("Нет выбранных обьектов!");
                     }
-                }
-                else
-                {
-                    Message.Warning("Пожалуйста, откройте сборку!");
                 }
             }
         }

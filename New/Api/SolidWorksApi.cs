@@ -30,6 +30,16 @@ namespace Course
             return solidWorks;
         }
 
+        public static AssemblyDoc CreateNewAssembly(SW solidWorks) {
+            AssemblyDoc assemblyDocument = null;
+
+            if (solidWorks != null) {
+                assemblyDocument = solidWorks.INewAssembly();
+            }
+
+            return assemblyDocument;
+        }
+
         public static Boolean TryGetActiveAssembly(SW solidWorks, ref AssemblyDoc assemblyDocument, ref SelectionMgr selectionManager)
         {
             var isDone = false;
