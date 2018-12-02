@@ -13,10 +13,20 @@ namespace Course.Debug {
             Console.WriteLine();
             textString = String.Concat(textString, "} ", type.Name);
             foreach (var property in type.GetProperties()) {
-                textString = String.Concat(textString, '\n', "\t{0},", property.Name);
+                textString = String.Concat(textString, '\n', Debuger.WriteMember(property.Name, property.GetValue(@object, null).ToString()));
             }
             textString = String.Concat(textString, '\n', "}");
             Typewriter.Output(textString, ConsoleColor.DarkGreen);
+        }
+
+        private static String WriteMember(String name, String value, Int32? indents = 1) {
+            String indentString = "";
+            
+            for (var i = 0; i < indents; i++) {
+                indentString += ' ';
+            }
+
+            return String.Format("{0}{1}: {2},", indentString, name, value);
         }
     }
 }

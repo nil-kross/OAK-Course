@@ -21,6 +21,8 @@ namespace Course
 
         public void Start()
         {
+            var isSmthChanged = false;
+
             this.solidWorks = SolidWorksApi.GetSolidWorks();
 
             if (this.solidWorks == null)
@@ -33,10 +35,13 @@ namespace Course
             {
                 AssemblyDoc assemblyDocument = null;
                 SelectionMgr selectionManager = null;
+                Surface first = null; // Отв.1 // Опорная
+                Surface second = null; // Отв. 2 // Опроная 2
+                Surface third = null; // Пл-ть // Уст. база
 
-                if (!SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager)) {
+                while (!SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager)) {
                     var assemblyPathwayString = @"L:\2 Definitions\ОАК\2\Assembly 2.SLDASM";
-                    
+
                     assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(solidWorks, DocumentTypes.Assembly, assemblyPathwayString);
 
                     if (assemblyDocument == null) {
@@ -47,20 +52,42 @@ namespace Course
 
                 Input.Key("Выберите плоскости:" + System.Environment.NewLine + "[Продолжить]");
 
-                {
+                if (selectionManager == null) {
+                    Message.Warning("Selection Manager был null!");
+                } else {
                     var selectedObjectsList = SolidWorksApi.GetSelectedObjects(selectionManager);
 
                     if (selectedObjectsList != null) {
                         foreach (var obj in selectedObjectsList) {
-                            Message.Text(obj.ToString());
-                            Debuger.Show(obj);
+                            var face = obj as IFace2;
+
+                            var surface = face.IGetSurface();
+                            if (surface.IsCylinder()) {
+                                if (first == null) {
+                                    first = surface;
+                                } else {
+                                    second = surface;
+                                }
+                            } else if (surface.IsPlane()) {
+                                third = surface;
+                            }
                         }
                     } else {
-                        Message.Warning("Нет выбранных обьектов!");
+                        Message.Info("Нет выбранных обьектов!");
                     }
+                    
+                    if (first != null && second != null && third != null) {
+                        Debuger.Show(first);
+                        Debuger.Show(second);
+                        Debuger.Show(third);
+                        // TO DO: вставить локаторы, отрегулировать размеры, сопрячь, добавить плиту
+                    }
+                    // Dev zone is over!
                 }
 
-                SolidWorksApi.CloseAssemblies(this.solidWorks);
+                if (isSmthChanged) {
+                    SolidWorksApi.CloseAssemblies(this.solidWorks);
+                }
             }
         }
     }
