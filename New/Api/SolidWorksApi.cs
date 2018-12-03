@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SW = SolidWorks.Interop.sldworks.SldWorks;
-using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Course.Debug;
 using Course.Api;
+using Course.Components;
+using SolidWorks.Interop.sldworks;
+using Component = Course.Components.Component;
 
 namespace Course.Api
 {
@@ -125,6 +127,10 @@ namespace Course.Api
             }
 
             return modelDocument;
+        }
+
+        public static ModelDoc2 InsertComponent(Component component, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null) {
+            return SolidWorksApi.InsertComponent(component.FileNamePathway, solidWorks, assemblyDocument, point);
         }
     }
 }

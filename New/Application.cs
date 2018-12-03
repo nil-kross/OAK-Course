@@ -80,6 +80,9 @@ namespace Course
                         Debuger.Show(first);
                         Debuger.Show(second);
                         Debuger.Show(third);
+
+
+
                         // TO DO: вставить локаторы, отрегулировать размеры, сопрячь, добавить плиту
                     }
                     // Dev zone is over!
