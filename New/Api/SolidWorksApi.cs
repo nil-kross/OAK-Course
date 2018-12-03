@@ -11,6 +11,7 @@ using Course.Api;
 using Course.Components;
 using SolidWorks.Interop.sldworks;
 using Component = Course.Components.Component;
+using System.IO;
 
 namespace Course.Api
 {
@@ -112,18 +113,24 @@ namespace Course.Api
             return selectedObjectsList;
         }
 
-        public static ModelDoc2 InsertComponent(String unitFilePathway, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null)
+        public static ModelDoc2 InsertComponent(String filePathway, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null)
         {
             Point centerPoint = point ?? new Point();
             Int32 errorValue = 0;
             Int32 warningValue = 0;
             ModelDoc2 modelDocument = null;
 
-            modelDocument = solidWorks.OpenDoc6(unitFilePathway, 1, 1, "", ref errorValue, ref warningValue);
-            if (modelDocument != null)
-            {
-                assemblyDocument.AddComponent(unitFilePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
-                modelDocument.Close();
+            if (File.Exists(filePathway)) {
+                modelDocument = solidWorks.OpenDoc6(filePathway, 1, 1, "", ref errorValue, ref warningValue);
+                if (modelDocument != null) {
+                    assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
+
+                    try {
+                        modelDocument.Close();
+                    } catch {}
+                }
+            } else {
+                Message.Error("Файл указанного компонента не найден!");
             }
 
             return modelDocument;

@@ -25,12 +25,14 @@ namespace Course.Components {
 
     public class CustomComponent : Component {
         private String fileNameString = null;
+        private String folderNameString = null;
 
         public override String FileName => this.fileNameString;
-        protected override String FolderPathwayString => "Units";
+        protected override String FolderPathwayString => this.folderNameString;
 
-        public CustomComponent(String fileName) {
+        public CustomComponent(String fileName, String folder) {
             this.fileNameString = fileName;
+            this.folderNameString = folder;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Course.Api;
+using Course.Components;
 using Course.Debug;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -81,7 +82,9 @@ namespace Course
                         Debuger.Show(second);
                         Debuger.Show(third);
 
-
+                        var cc = new CustomComponent("Locator1", @"L:\3 Repositories\OAK-Course\New\bin\Debug\Units");
+                        var md = SolidWorksApi.InsertComponent(cc, solidWorks, assemblyDocument);
+                        
 
                         // TO DO: вставить локаторы, отрегулировать размеры, сопрячь, добавить плиту
                     }
