@@ -110,8 +110,9 @@ namespace Course.Api
             return selectedObjectsList;
         }
 
-        public static ModelDoc2 InsertComponent(String unitFilePathway, SW solidWorks, AssemblyDoc assemblyDocument)
+        public static ModelDoc2 InsertComponent(String unitFilePathway, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null)
         {
+            Point centerPoint = point ?? new Point();
             Int32 errorValue = 0;
             Int32 warningValue = 0;
             ModelDoc2 modelDocument = null;
@@ -119,7 +120,7 @@ namespace Course.Api
             modelDocument = solidWorks.OpenDoc6(unitFilePathway, 1, 1, "", ref errorValue, ref warningValue);
             if (modelDocument != null)
             {
-                assemblyDocument.AddComponent(unitFilePathway, 0.0, 0.0, 0.1);
+                assemblyDocument.AddComponent(unitFilePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
                 modelDocument.Close();
             }
 
