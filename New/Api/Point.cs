@@ -42,7 +42,7 @@ namespace Course.Api {
         }
 
         public Double[] ToArray() {
-            return this.valuesArray;
+            return new Double[3] { this.X, this.Y, this.Z };
         }
 
         public override String ToString() {

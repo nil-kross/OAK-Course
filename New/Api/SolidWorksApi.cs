@@ -145,10 +145,14 @@ namespace Course.Api
 
             if (faces != null) {
                 foreach (var currFace in faces) {
-                    Double[] normalValuesArray  = currFace.Normal;
+                    var surface = currFace.GetSurface() as Surface;
 
-                    if (SolidWorksApi.CompareParams(normalValuesArray, normal.ToArray(), Point.AxisesCount)) {
-                        face = currFace;
+                    if (!surface.IsCylinder()) {
+                        Double[] normalValuesArray = currFace.Normal;
+
+                        if (SolidWorksApi.CompareParams(normalValuesArray, normal.ToArray(), Point.AxisesCount)) {
+                            face = currFace;
+                        }
                     }
                 }
             } else {
@@ -279,7 +283,7 @@ namespace Course.Api
                     ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(one, null);
                     ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(another, null);
 
-                    {
+                    if (true) {
                         Int32 statusValue = 0;
                         Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(0, 1, false, 0.051126624765061614, 0.001, 0.001, 0.001, 0.001, 1.5707963267948966, 0.52359877559830004, 0.52359877559830004, false, out statusValue)));
 

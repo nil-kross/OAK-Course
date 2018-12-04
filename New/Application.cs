@@ -102,7 +102,8 @@ namespace Course
                         var penek = new CustomUnit("Locator7");
 
                         var md = SolidWorksApi.InsertComponent(penek, this.solidWorks, assemblyDocument);
-                        var c = SolidWorksApi.FindComponents(penek, assemblyDocument)[0];
+                        var cs = SolidWorksApi.FindComponents(penek, assemblyDocument);
+                        var c = cs[0];
 
                         var m = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(c), new Point(0, 1, 0));
                         var res = SolidWorksApi.Mate(third, m, assemblyDocument);
