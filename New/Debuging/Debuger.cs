@@ -9,11 +9,24 @@ namespace Course.Debug {
         public static void Show(Object @object) {
             Type type = @object.GetType();
             var textString = "";
+            var valueString = "";
 
-            Console.WriteLine();
-            textString = String.Concat(textString, "} ", type.Name);
+            if (type.IsArray) {
+                foreach (var value in @object as Array) {
+                    valueString += value.ToString() + ", ";
+                }
+            } else {
+                valueString = @object.ToString();
+            }
+
+            textString += String.Format("{0}: {1}\n", type.Name, valueString);
+            textString = String.Concat(textString, "} ");
             foreach (var property in type.GetProperties()) {
-                textString = String.Concat(textString, '\n', Debuger.WriteMember(property.Name, property.GetValue(@object, null).ToString()));
+                if (property.GetAccessors() != null && property.GetIndexParameters().Count() <= 0) {
+                    var value = property.GetValue(@object);
+                    
+                    textString = String.Concat(textString, '\n', Debuger.WriteMember(property.Name, value.ToString()));
+                }
             }
             textString = String.Concat(textString, '\n', "}");
             Typewriter.Output(textString, ConsoleColor.DarkGreen);
@@ -22,7 +35,7 @@ namespace Course.Debug {
         private static String WriteMember(String name, String value, Int32? indents = 1) {
             String indentString = "";
             
-            for (var i = 0; i < indents; i++) {
+            for (var i = 0; i < indents * 2; i++) {
                 indentString += ' ';
             }
 
