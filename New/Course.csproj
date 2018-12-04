@@ -56,6 +56,7 @@
     <Compile Include="Api\SelectTypes.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\CustomUnit.cs" />
     <Compile Include="Components\Part.cs" />
     <Compile Include="Debuging\Debuger.cs" />
     <Compile Include="Debuging\Input.cs" />
