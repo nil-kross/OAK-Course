@@ -23,13 +23,27 @@ namespace Course.Debug {
             var isFirstLine = true;
 
             foreach (var line in lines) {
-                Typewriter.Write(
-                    (isFirstLine ? DateTime.Now.ToString("[hh:mm.ss] ") : "           ") + line,
-                    consoleColor
-                );
+                Typewriter.WriteTab(isFirstLine);
+                Typewriter.Write(line, consoleColor);
                 Console.WriteLine();
 
                 isFirstLine = false;
+            }
+        }
+
+        private static void WriteTab(Boolean isTimeStamp = false) {
+            var format = "[hh:mm.ss] ";
+
+            if (isTimeStamp) {
+                Typewriter.Write(DateTime.Now.ToString("[hh:mm.ss] "), ConsoleColor.DarkGray);
+            } else {
+                var emptyString = "";
+
+                for (var i = 0; i < format.Length; i++) {
+                    emptyString += ' ';
+                }
+
+                Typewriter.Write(emptyString, ConsoleColor.Black);
             }
         }
     }
