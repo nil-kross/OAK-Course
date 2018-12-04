@@ -41,6 +41,10 @@ namespace Course.Api {
             this.Z = z;
         }
 
+        public Double[] ToArray() {
+            return this.valuesArray;
+        }
+
         public override String ToString() {
             return String.Format("{0}; {1}; {2}", this.X, this.Y, this.Z);
         }

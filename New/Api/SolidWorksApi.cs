@@ -139,5 +139,160 @@ namespace Course.Api
         public static ModelDoc2 InsertComponent(Component component, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null) {
             return SolidWorksApi.InsertComponent(component.FileNamePathway, solidWorks, assemblyDocument, point);
         }
+
+        public static Face2 FindFace(IEnumerable<Face2> faces, Point normal) {
+            Face2 face = null;
+
+            if (faces != null) {
+                foreach (var currFace in faces) {
+                    Double[] normalValuesArray  = currFace.Normal;
+
+                    if (SolidWorksApi.CompareParams(normalValuesArray, normal.ToArray(), Point.AxisesCount)) {
+                        face = currFace;
+                    }
+                }
+            } else {
+                Message.Error("Перечисление граней было null!");
+            }
+
+            return face;
+        }
+
+        public static Face2 FindPlane(IEnumerable<Face2> faces, Double[] etalon) {
+            Face2 face = null;
+
+            if (faces != null) {
+                foreach (var currFace in faces) {
+                    Surface plane = currFace.IGetSurface();
+
+                    if (plane != null && plane.IsPlane()) {
+                        Double[] planeParamsArray = plane.PlaneParams;
+
+                        if (SolidWorksApi.CompareParams(planeParamsArray, etalon, 6)) {
+                            face = currFace;
+                        }
+                    }
+                }
+            } else {
+                Message.Error("Перечисление граней было null!");
+            }
+
+            return face;
+        }
+
+        public static Face2 FindCylinder(IEnumerable<Face2> faces, Double[] etalon) {
+            Face2 face = null;
+
+            if (faces != null) {
+                foreach (var currFace in faces) {
+                    Surface plane = currFace.IGetSurface();
+
+                    if (plane != null && plane.IsCylinder()) {
+                        Double[] planeParamsArray = plane.CylinderParams;
+
+                        if (SolidWorksApi.CompareParams(planeParamsArray, etalon, 7)) {
+                            face = currFace;
+                        }
+                    }
+                }
+            } else {
+                Message.Error("Перечисление граней было null!");
+            }
+
+            return face;
+        }
+
+        public static IEnumerable<Face2> GetFaces(Component2 component) {
+            IList<Face2> facesList = null;
+
+            if (component != null) {
+                var body = component.GetBody() as Body;
+                var curFace = body.GetFirstFace() as Face2;
+
+                while (curFace != null) {
+                    if (facesList == null) {
+                        facesList = new List<Face2>();
+                    }
+                    facesList.Add(curFace);
+
+                    curFace = curFace.GetNextFace() as Face2;
+                }
+            } else {
+                Message.Error("Компонент был null!");
+            }
+
+            return facesList;
+        }
+
+        public static Boolean CompareParams(Double[] current, Double[] etalon, Int32 count) {
+            var isEqual = false;
+
+            if (current.Length == count && etalon.Length == count) {
+                isEqual = true;
+
+                for (var i = 0; i < count; i++) {
+                    if (Math.Abs(current[i] - etalon[i]) > 0.0001f) {
+                        isEqual = false;
+                    }
+                }
+            } else {
+                Message.Error("Параметры имели разную размерность!");
+            }
+
+            return isEqual;
+        }
+
+        public static IList<Component2> FindComponents(String fileName, AssemblyDoc assemblyDocument) {
+            IList<Component2> components = null;
+
+            if (assemblyDocument != null) {
+                Object[] objectsArray = assemblyDocument.GetComponents(true);
+
+                foreach (Object componentObject in objectsArray) {
+                    if (componentObject is Component2 currComponent) {
+                        if (currComponent.Name.Contains(fileName)) {
+                            if (components == null) {
+                                components = new List<Component2>();
+                            }
+                            components.Add(currComponent);
+                            currComponent.MakeVirtual();
+                        }
+                    }
+                }
+            } else {
+                Message.Error("Документ сборки был null!");
+            }
+
+            return components;
+        }
+
+        public static IList<Component2> FindComponents(Component component, AssemblyDoc assemblyDocument) {
+            return SolidWorksApi.FindComponents(component.FileName, assemblyDocument);
+        }
+
+        public static Boolean Mate(Face2 one, Face2 another, AssemblyDoc assemblyDocument) {
+            var isDone = false;
+
+            if (assemblyDocument != null) {
+                if (one != null && another != null) {
+                    (assemblyDocument as ModelDoc2).ClearSelection();
+                    ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(one, null);
+                    ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(another, null);
+
+                    {
+                        Int32 statusValue = 0;
+                        Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(0, 1, false, 0.051126624765061614, 0.001, 0.001, 0.001, 0.001, 1.5707963267948966, 0.52359877559830004, 0.52359877559830004, false, out statusValue)));
+
+                        isDone = statusValue == 1;
+                    }
+                } else {
+                    Message.Error("Одна из граней была null!");
+                }
+            } else {
+                Message.Error("Документ сборки был null!");
+            }
+
+            return isDone;
+        }
     }
 }
