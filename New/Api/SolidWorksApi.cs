@@ -33,6 +33,7 @@ namespace Course.Api
 
             return solidWorks;
         }
+
         public static ModelDoc2 OpenDocument(SW solidWorks, DocumentTypes documentType, String fileNamePathway) {
             ModelDoc2 modelDocument = null;
 
@@ -45,6 +46,11 @@ namespace Course.Api
             }
 
             return modelDocument;
+        }
+
+        public static ModelDoc2 OpenDocument(SW solidWorks, DocumentTypes documentType, Component component)
+        {
+            return SolidWorksApi.OpenDocument(solidWorks, documentType, component.FileNamePathway);
         }
 
         public static void CloseAssemblies(SW solidWorks) {

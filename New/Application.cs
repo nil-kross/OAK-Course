@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Component = Course.Components.Component;
 using SW = SolidWorks.Interop.sldworks.SldWorks;
 
 namespace Course
@@ -41,9 +42,9 @@ namespace Course
                 Surface third = null; // Пл-ть // Уст. база
 
                 while (!SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager)) {
-                    var assemblyPathwayString = @"L:\2 Definitions\ОАК\2\Assembly 2.SLDASM";
+                    var defaultComponent = new CustomComponent("2", "Assembly");
 
-                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(solidWorks, DocumentTypes.Assembly, assemblyPathwayString);
+                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(solidWorks, DocumentTypes.Assembly, defaultComponent);
 
                     if (assemblyDocument == null) {
                         Message.Info("Создаю новую сборку..");
@@ -78,11 +79,17 @@ namespace Course
                     }
                     
                     if (first != null && second != null && third != null) {
+                        var componentsList = new List<Component>()
+                        {
+                            new CustomComponent("Locator1", "Units"),
+                            new CustomComponent("Locator1", "Units"),
+                        };
+
                         Debuger.Show(first);
                         Debuger.Show(second);
                         Debuger.Show(third);
 
-                        var cc = new CustomComponent("Locator1", @"L:\3 Repositories\OAK-Course\New\bin\Debug\Units");
+                        var cc = new CustomComponent("Locator1", "Units");
                         var md = SolidWorksApi.InsertComponent(cc, solidWorks, assemblyDocument);
                         
 

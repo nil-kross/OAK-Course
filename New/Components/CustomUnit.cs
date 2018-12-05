@@ -8,9 +8,12 @@ namespace Course.Components
 {
     public class CustomUnit : Unit
     {
-        private readonly String fileNameString = null; 
+        private readonly String fileNameString = null;
 
-        public override string FileName => this.fileNameString;
+        public override string FileName
+        {
+            get { return this.fileNameString; }
+        }
 
         public CustomUnit(String fileName)
         {

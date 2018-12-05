@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Course.Components {
     public class Finger : Unit {
-        public override String FileName => "Locator1";
+        public override String FileName {
+            get { return "Locator1"; }   
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Course.Api;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,25 +15,12 @@ namespace Course.Components {
         }
         public String FileNamePathway {
             get {
-                return String.Format(@"{0}\{1}.SLDPRT", this.FolderPathwayString, this.FileName);
+                return Pathway.Resolve(String.Format(@"{0}\{1}.SLDPRT", this.FolderPathwayString, this.FileName));
             }
         }
 
         public override String ToString() {
             return this.FileNamePathway;
-        }
-    }
-
-    public class CustomComponent : Component {
-        private String fileNameString = null;
-        private String folderNameString = null;
-
-        public override String FileName => this.fileNameString;
-        protected override String FolderPathwayString => this.folderNameString;
-
-        public CustomComponent(String fileName, String folder) {
-            this.fileNameString = fileName;
-            this.folderNameString = folder;
         }
     }
 }
