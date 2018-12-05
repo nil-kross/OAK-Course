@@ -52,10 +52,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\DocumentTypes.cs" />
+    <Compile Include="Api\Pathway.cs" />
     <Compile Include="Api\Point.cs" />
     <Compile Include="Api\SelectTypes.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\CustomComponent.cs" />
     <Compile Include="Components\CustomUnit.cs" />
     <Compile Include="Components\Part.cs" />
     <Compile Include="Debuging\Debuger.cs" />
