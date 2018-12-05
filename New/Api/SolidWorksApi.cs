@@ -132,8 +132,10 @@ namespace Course.Api
                     assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
 
                     try {
-                        modelDocument.Close();
+                        //modelDocument.Close();
                     } catch {}
+                } else {
+                    Message.Error("Не удалось открыть деталь из файла '" + filePathway + "'!");
                 }
             } else {
                 Message.Error("Файл указанного компонента не найден!");
@@ -280,7 +282,7 @@ namespace Course.Api
             return SolidWorksApi.FindComponents(component.FileName, assemblyDocument);
         }
 
-        public static Boolean Mate(Face2 one, Face2 another, AssemblyDoc assemblyDocument) {
+        public static Boolean Mate(Face2 one, Face2 another, Mates mate, Aligns align, AssemblyDoc assemblyDocument) {
             var isDone = false;
 
             if (assemblyDocument != null) {
@@ -291,7 +293,7 @@ namespace Course.Api
 
                     if (true) {
                         Int32 statusValue = 0;
-                        Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3(0, 1, false, 0.051126624765061614, 0.001, 0.001, 0.001, 0.001, 1.5707963267948966, 0.52359877559830004, 0.52359877559830004, false, out statusValue)));
+                        Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3((Int32)mate, (Int32)align, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, out statusValue)));
 
                         isDone = statusValue == 1;
                     }

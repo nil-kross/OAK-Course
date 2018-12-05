@@ -9,9 +9,7 @@ namespace Course.Components {
     public abstract class Unit : Component {
         protected override String FolderPathwayString
         {
-            get {
-                return Pathway.Resolve("Units"); 
-            }
+            get { return "Units"; }
         }
     }
 }

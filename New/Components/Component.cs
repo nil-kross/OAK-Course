@@ -15,7 +15,9 @@ namespace Course.Components {
         }
         public String FileNamePathway {
             get {
-                return Pathway.Resolve(String.Format(@"{0}\{1}.SLDPRT", this.FolderPathwayString, this.FileName));
+                var a = Pathway.Resolve(String.Format("{0}{2}{1}.SLDPRT", this.FolderPathwayString, this.FileName, '\\'));
+
+                return a;
             }
         }
 

@@ -42,15 +42,16 @@ namespace Course
                 Face2 third = null; // Пл-ть // Уст. база
 
                 while (!SolidWorksApi.TryGetActiveAssembly(this.solidWorks, ref assemblyDocument, ref selectionManager)) {
-                    var assemblyPathwayString = @"L:\2 Definitions\ОАК\2\Assembly 2.SLDASM";
+                    var assemblyPathwayString = @"Assembly\Assembly 2.SLDASM";
 
-                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(this.solidWorks, DocumentTypes.Assembly, assemblyPathwayString);
+                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(this.solidWorks, DocumentTypes.Assembly, Pathway.Resolve(assemblyPathwayString));
 
                     if (assemblyDocument == null) {
+                        Message.Warning("не удалось открыть сборку " + assemblyPathwayString + "!");
                         Message.Info("Создаю новую сборку..");
                         SolidWorksApi.CreateNewAssembly(this.solidWorks);
                     } else {
-                        Message.Info("Удалось открыть сборку " + assemblyPathwayString);
+                        Message.Info("Удалось открыть сборку " + assemblyPathwayString + "!");
                     }
                 }
 
@@ -92,32 +93,51 @@ namespace Course
                         third
                     };
 
-                    if (false) {
-                        var baseFinger = new CustomUnit("Locator1");
+                    if (true) {
+                        var finger = new CustomUnit("Locator1");
 
-                        var md = SolidWorksApi.InsertComponent(baseFinger, this.solidWorks, assemblyDocument);
-                        var c = SolidWorksApi.FindComponents(baseFinger, assemblyDocument)[0];
+                        var modelDocument = SolidWorksApi.InsertComponent(finger, this.solidWorks, assemblyDocument);
+                        var componentsList = SolidWorksApi.FindComponents(finger, assemblyDocument);
+                        var component = componentsList[0];
+                        var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
+                        var isDone = SolidWorksApi.Mate(first, targetFace, Mates.Concentric, Aligns.Align, assemblyDocument);
+
+                        isSmthChanged = true;
+                    }
+                    if (true) {
+                        var finger = new CustomUnit("Locator2");
+
+                        var modelDocument = SolidWorksApi.InsertComponent(finger, this.solidWorks, assemblyDocument);
+                        var componentsList = SolidWorksApi.FindComponents(finger, assemblyDocument);
+                        var component = componentsList[0];
+                        var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
+                        var isDone = SolidWorksApi.Mate(second, targetFace, Mates.Concentric, Aligns.Align, assemblyDocument);
+
+                        isSmthChanged = true;
                     }
                     if (true) {
                         var penek = new CustomUnit("Locator7");
 
-                        var md = SolidWorksApi.InsertComponent(penek, this.solidWorks, assemblyDocument);
-                        var cs = SolidWorksApi.FindComponents(penek, assemblyDocument);
-                        var c = cs[0];
+                        var modelDocument = SolidWorksApi.InsertComponent(penek, this.solidWorks, assemblyDocument);
+                        var componentsList = SolidWorksApi.FindComponents(penek, assemblyDocument);
+                        var component = componentsList[0];
+                        var targetFace = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(component), new Point(0, 1, 0));
+                        var isDone = SolidWorksApi.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
 
-                        var m = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(c), new Point(0, 1, 0));
-                        var res = SolidWorksApi.Mate(third, m, assemblyDocument);
+                        isSmthChanged = true;
                     }
-
-                    Message.Text("It's time to stop!");
-                    return;
-
-                    // TO DO: вставить локаторы, отрегулировать размеры, сопрячь, добавить плиту
                 } else {
                     Message.Error("Выбранные плоскости не удовлетворяют заданию!");
                 }
 
                 if (isSmthChanged) {
+                    var key = Input.Key("Нажмите [Space], чтобы закрыть все документы деталей и сборок..");
+
+                    if (key == ConsoleKey.Spacebar) {
+                        return;
+                    }
+
+                    Message.Info("Закрываю все документы деталей и сборок..");
                     SolidWorksApi.CloseAssemblies(this.solidWorks);
                 }
             }
