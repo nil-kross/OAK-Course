@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Component = Course.Components.Component;
 using SW = SolidWorks.Interop.sldworks.SldWorks;
 
 namespace Course
@@ -26,76 +25,96 @@ namespace Course
             var isSmthChanged = false;
 
             this.solidWorks = SolidWorksApi.GetSolidWorks();
+            while (this.solidWorks == null) {
+                Message.Info("Пожалуйста, запустите приложение SolidWorks.");
+                Input.Key("После этого, нажмите любую клавишу для продолжения..");
+            }
 
             if (this.solidWorks == null)
             {
-                Message.Warning("Пожалуйста, запустите приложение SolidWorks.");
-
+                Message.Error("Не удалось получить дескриптор SolidWorks, завершаю выполнение!..");
                 return;
-            }
-            else
-            {
+            } else {
                 AssemblyDoc assemblyDocument = null;
                 SelectionMgr selectionManager = null;
-                Surface first = null; // Отв.1 // Опорная
-                Surface second = null; // Отв. 2 // Опроная 2
-                Surface third = null; // Пл-ть // Уст. база
+                Face2 first = null; // Отв.1 // Опорная
+                Face2 second = null; // Отв. 2 // Опроная 2
+                Face2 third = null; // Пл-ть // Уст. база
 
-                while (!SolidWorksApi.TryGetActiveAssembly(solidWorks, ref assemblyDocument, ref selectionManager)) {
-                    var defaultComponent = new CustomComponent("2", "Assembly");
+                while (!SolidWorksApi.TryGetActiveAssembly(this.solidWorks, ref assemblyDocument, ref selectionManager)) {
+                    var assemblyPathwayString = @"L:\2 Definitions\ОАК\2\Assembly 2.SLDASM";
 
-                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(solidWorks, DocumentTypes.Assembly, defaultComponent);
+                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(this.solidWorks, DocumentTypes.Assembly, assemblyPathwayString);
 
                     if (assemblyDocument == null) {
                         Message.Info("Создаю новую сборку..");
-                        SolidWorksApi.CreateNewAssembly(solidWorks);
+                        SolidWorksApi.CreateNewAssembly(this.solidWorks);
+                    } else {
+                        Message.Info("Удалось открыть сборку " + assemblyPathwayString);
                     }
                 }
 
-                Input.Key("Выберите плоскости:" + System.Environment.NewLine + "[Продолжить]");
+                while (SolidWorksApi.GetSelectedObjects(selectionManager) == null) {
+                    Message.Warning("Не удалось найти выбранные плоскости!");
+                    Input.Key("Выберите плоскости:" + System.Environment.NewLine + "[Продолжить]");
+                }
 
                 if (selectionManager == null) {
-                    Message.Warning("Selection Manager был null!");
+                    Message.Error("Selection Manager был null!");
                 } else {
                     var selectedObjectsList = SolidWorksApi.GetSelectedObjects(selectionManager);
 
                     if (selectedObjectsList != null) {
                         foreach (var obj in selectedObjectsList) {
-                            var face = obj as IFace2;
+                            var face = obj as Face2;
 
                             var surface = face.IGetSurface();
                             if (surface.IsCylinder()) {
                                 if (first == null) {
-                                    first = surface;
+                                    first = face;
                                 } else {
-                                    second = surface;
+                                    second = face;
                                 }
                             } else if (surface.IsPlane()) {
-                                third = surface;
+                                third = face;
                             }
                         }
                     } else {
                         Message.Info("Нет выбранных обьектов!");
+                        return;
                     }
-                    
-                    if (first != null && second != null && third != null) {
-                        var componentsList = new List<Component>()
-                        {
-                            new CustomComponent("Locator1", "Units"),
-                            new CustomComponent("Locator1", "Units"),
-                        };
+                }
 
-                        Debuger.Show(first);
-                        Debuger.Show(second);
-                        Debuger.Show(third);
+                if (first != null && second != null && third != null) {
+                    var selectedFacesList = new List<Face2>() {
+                        first,
+                        second,
+                        third
+                    };
 
-                        var cc = new CustomComponent("Locator1", "Units");
-                        var md = SolidWorksApi.InsertComponent(cc, solidWorks, assemblyDocument);
-                        
+                    if (false) {
+                        var baseFinger = new CustomUnit("Locator1");
 
-                        // TO DO: вставить локаторы, отрегулировать размеры, сопрячь, добавить плиту
+                        var md = SolidWorksApi.InsertComponent(baseFinger, this.solidWorks, assemblyDocument);
+                        var c = SolidWorksApi.FindComponents(baseFinger, assemblyDocument)[0];
                     }
-                    // Dev zone is over!
+                    if (true) {
+                        var penek = new CustomUnit("Locator7");
+
+                        var md = SolidWorksApi.InsertComponent(penek, this.solidWorks, assemblyDocument);
+                        var cs = SolidWorksApi.FindComponents(penek, assemblyDocument);
+                        var c = cs[0];
+
+                        var m = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(c), new Point(0, 1, 0));
+                        var res = SolidWorksApi.Mate(third, m, assemblyDocument);
+                    }
+
+                    Message.Text("It's time to stop!");
+                    return;
+
+                    // TO DO: вставить локаторы, отрегулировать размеры, сопрячь, добавить плиту
+                } else {
+                    Message.Error("Выбранные плоскости не удовлетворяют заданию!");
                 }
 
                 if (isSmthChanged) {
