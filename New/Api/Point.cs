@@ -29,7 +29,9 @@ namespace Course.Api {
             }
         }
 
-        public static Int32 AxisesCount => 3;
+        public static Int32 AxisesCount { 
+            get { return 3; }
+        }
 
         public Point() {
             this.valuesArray = new Double[3] { 0, 0, 0 };

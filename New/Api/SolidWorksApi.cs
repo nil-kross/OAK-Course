@@ -261,7 +261,9 @@ namespace Course.Api
                 Object[] objectsArray = assemblyDocument.GetComponents(true);
 
                 foreach (Object componentObject in objectsArray) {
-                    if (componentObject is Component2 currComponent) {
+                    var currComponent = componentObject as Component2;
+
+                    if (componentObject != null) {
                         if (currComponent.Name.Contains(fileName)) {
                             if (components == null) {
                                 components = new List<Component2>();
