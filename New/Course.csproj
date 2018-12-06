@@ -52,11 +52,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Aligns.cs" />
+    <Compile Include="Api\BaseSurface.cs" />
+    <Compile Include="Api\Cylinder.cs" />
     <Compile Include="Api\DocumentTypes.cs" />
     <Compile Include="Api\Mates.cs" />
     <Compile Include="Api\Pathway.cs" />
+    <Compile Include="Api\Plane.cs" />
     <Compile Include="Api\Point.cs" />
+    <Compile Include="Api\Role.cs" />
     <Compile Include="Api\SelectTypes.cs" />
+    <Compile Include="Api\SurfaceBuilder.cs" />
+    <Compile Include="Api\Target.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\CustomComponent.cs" />
