@@ -132,6 +132,7 @@ namespace Course.Api
                     assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
 
                     try {
+                        modelDocument.EditCopy();
                         //modelDocument.Close();
                     } catch {}
                 } else {
@@ -307,6 +308,38 @@ namespace Course.Api
             }
 
             return isDone;
+        }
+
+        public static void SetEquations(IComponent2 component, IList<Equation> equations) {
+            if (component != null) {
+                ModelDoc2 modelDocument = component.GetModelDoc2();
+                EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
+
+                for (var i = 0; i < equations.Count; i++) {
+                    equationManager.Equation[i] = String.Format("{0}{1}{0}={2}", '"', equations[i].Name, equations[i].Value);
+                }
+
+                equationManager.EvaluateAll();
+                modelDocument.EditRebuild3();
+                modelDocument.GraphicsRedraw();
+            } else {
+                Message.Error("Компонент был null!");
+            }
+        }
+
+        public static void SetEquation(IComponent2 component, Int32 index, Equation equation) {
+            if (component != null) {
+                ModelDoc2 modelDocument = component.GetModelDoc2();
+                EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
+
+                equationManager.Equation[index] = String.Format("{0}{1}{0}={2}", '"', equation.Name, equation.Value);
+
+                equationManager.EvaluateAll();
+                modelDocument.EditRebuild3();
+                modelDocument.GraphicsRedraw();
+            } else {
+                Message.Error("Компонент был null!");
+            }
         }
     }
 }

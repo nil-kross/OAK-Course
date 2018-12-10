@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Course.Api
 {
-    public class BaseSurface : ISurface
+    public class BaseSurface
     {
         protected readonly IFace2 face = null;
         protected readonly ISurface surface = null;

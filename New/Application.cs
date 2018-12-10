@@ -100,6 +100,10 @@ namespace Course
                         var componentsList = SolidWorksApi.FindComponents(finger, assemblyDocument);
                         var component = componentsList[0];
                         var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
+                        var cylinder = new Cylinder(first);
+                        {
+                            SolidWorksApi.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                        }
                         var isDone = SolidWorksApi.Mate(first, targetFace, Mates.Concentric, Aligns.Align, assemblyDocument);
 
                         isSmthChanged = true;
@@ -111,6 +115,10 @@ namespace Course
                         var componentsList = SolidWorksApi.FindComponents(finger, assemblyDocument);
                         var component = componentsList[0];
                         var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
+                        var cylinder = new Cylinder(second);
+                        {
+                            SolidWorksApi.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                        }
                         var isDone = SolidWorksApi.Mate(second, targetFace, Mates.Concentric, Aligns.Align, assemblyDocument);
 
                         isSmthChanged = true;
@@ -118,13 +126,15 @@ namespace Course
                     if (true) {
                         var penek = new CustomUnit("Locator7");
 
-                        var modelDocument = SolidWorksApi.InsertComponent(penek, this.solidWorks, assemblyDocument);
-                        var componentsList = SolidWorksApi.FindComponents(penek, assemblyDocument);
-                        var component = componentsList[0];
-                        var targetFace = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(component), new Point(0, 1, 0));
-                        var isDone = SolidWorksApi.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
+                        for (var c = 0; c < 3; c++) {
+                            var modelDocument = SolidWorksApi.InsertComponent(penek, this.solidWorks, assemblyDocument);
+                            var componentsList = SolidWorksApi.FindComponents(penek, assemblyDocument);
+                            var component = componentsList[0];
+                            var targetFace = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(component), new Point(0, 1, 0));
+                            var isDone = SolidWorksApi.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
 
-                        isSmthChanged = true;
+                            isSmthChanged = true;
+                        }
                     }
                 } else {
                     Message.Error("Выбранные плоскости не удовлетворяют заданию!");
@@ -133,7 +143,7 @@ namespace Course
                 if (isSmthChanged) {
                     var key = Input.Key("Нажмите [Space], чтобы закрыть все документы деталей и сборок..");
 
-                    if (key == ConsoleKey.Spacebar) {
+                    if (key != ConsoleKey.Spacebar) {
                         return;
                     }
 
