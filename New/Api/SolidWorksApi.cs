@@ -51,7 +51,7 @@ namespace Course.Api
 
         public static ModelDoc2 OpenDocument(SW solidWorks, DocumentTypes documentType, Component component)
         {
-            return SolidWorksApi.OpenDocument(solidWorks, documentType, component.FileNamePathway);
+            return SolidWorksApi.OpenDocument(solidWorks, documentType, component.Pathway);
         }
 
         public static void CloseAssemblies(SW solidWorks) {
@@ -150,7 +150,7 @@ namespace Course.Api
         }
 
         public static ModelDoc2 InsertComponent(Component component, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null) {
-            return SolidWorksApi.InsertComponent(component.FileNamePathway, solidWorks, assemblyDocument, point);
+            return SolidWorksApi.InsertComponent(component.Pathway, solidWorks, assemblyDocument, point);
         }
 
         public static Face2 FindFace(IEnumerable<Face2> faces, Point normal) {
@@ -288,7 +288,7 @@ namespace Course.Api
         }
 
         public static IList<Component2> FindComponents(Component component, AssemblyDoc assemblyDocument, Int32? orderNumber = null) {
-            return SolidWorksApi.FindComponents(component.FileName, assemblyDocument, orderNumber);
+            return SolidWorksApi.FindComponents(component.File, assemblyDocument, orderNumber);
         }
 
         public static Boolean Mate(Face2 one, Face2 another, Mates mate, Aligns align, AssemblyDoc assemblyDocument) {
