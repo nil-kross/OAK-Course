@@ -1,28 +1,28 @@
-﻿using Course.Api;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Course.Components {
     public abstract class Component {
-        protected abstract String FolderPathwayString { get; }
-        public abstract String FileName { get; }
-        public String Name { get {
+        protected abstract String Dimension { get; }
+        protected abstract String Folder { get; }
+        public abstract String File { get; }
+        public virtual String Name { get {
                 return this.GetType().Name;
             }
         }
-        public String FileNamePathway {
+        public String Pathway {
             get {
-                var a = Pathway.Resolve(String.Format("{0}{2}{1}.SLDPRT", this.FolderPathwayString, this.FileName, '\\'));
+                var pathwayString = Api.Pathway.Resolve(String.Format("{0}{2}{1}.{3}", this.Folder, this.File, '\\', this.Dimension));
 
-                return a;
+                return pathwayString;
             }
         }
 
         public override String ToString() {
-            return this.FileNamePathway;
+            return String.Format(
+                "{0}: {1}",
+                this.Name,
+                this.Pathway
+            );
         }
     }
 }

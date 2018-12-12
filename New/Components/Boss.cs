@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace Course.Components {
-    public class Finger : Unit {
+    public class Boss : Unit {
         public override String File {
-            get { return "Locator1"; }
+            get { return "Locator7"; }
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace Course.Components {
-    public abstract class Part : Component {
+    public abstract class Assembly : Component {
         protected override String Dimension {
-            get { return "SLDPRT"; }
+            get { return "SLDASM"; }
         }
     }
 }
