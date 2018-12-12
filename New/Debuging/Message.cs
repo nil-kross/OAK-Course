@@ -25,21 +25,21 @@ namespace Course.Debug {
 
         public static void Text(String messageText)
         {
-            Message.Show(messageText, MessageType.Text);
+            Message.Show(".." + messageText, MessageType.Text);
         }
 
         public static void Info(String messageText)
         {
-            Message.Show(messageText, MessageType.Info);
+            Message.Show("-i- " + messageText, MessageType.Info);
         }
         public static void Warning(String messageText)
         {
-            Message.Show(messageText, MessageType.Warning);
+            Message.Show("<!> " + messageText, MessageType.Warning);
         }
 
         public static void Error(String messageText)
         {
-            Message.Show(messageText, MessageType.Error);
+            Message.Show("(x) " + messageText, MessageType.Error);
         }
 
         private  static void Show(String messageText, MessageType? messageType = MessageType.Text) {

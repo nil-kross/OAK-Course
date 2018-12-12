@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Component = Course.Components.Component;
 using SW = SolidWorks.Interop.sldworks.SldWorks;
 
 namespace Course
@@ -22,6 +23,7 @@ namespace Course
 
         public void Start()
         {
+            var insertedComponentsList = new List<Component>();
             var isSmthChanged = false;
 
             this.solidWorks = SolidWorksApi.GetSolidWorks();
@@ -37,11 +39,12 @@ namespace Course
             } else {
                 AssemblyDoc assemblyDocument = null;
                 SelectionMgr selectionManager = null;
+                ModelDoc2 document = null;
                 Face2 first = null; // Отв.1 // Опорная
                 Face2 second = null; // Отв. 2 // Опроная 2
                 Face2 third = null; // Пл-ть // Уст. база
 
-                while (!SolidWorksApi.TryGetActiveAssembly(this.solidWorks, ref assemblyDocument, ref selectionManager)) {
+                while (!SolidWorksApi.TryGetActiveAssembly(this.solidWorks, ref assemblyDocument, ref selectionManager, ref document)) {
                     var assemblyPathwayString = @"Assembly\Assembly 2.SLDASM";
 
                     assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(this.solidWorks, DocumentTypes.Assembly, Pathway.Resolve(assemblyPathwayString));
@@ -106,6 +109,7 @@ namespace Course
                         }
                         var isDone = SolidWorksApi.Mate(first, targetFace, Mates.Concentric, Aligns.Align, assemblyDocument);
 
+                        insertedComponentsList.Add(finger);
                         isSmthChanged = true;
                     }
                     if (true) {
@@ -121,18 +125,20 @@ namespace Course
                         }
                         var isDone = SolidWorksApi.Mate(second, targetFace, Mates.Concentric, Aligns.Align, assemblyDocument);
 
+                        insertedComponentsList.Add(finger);
                         isSmthChanged = true;
                     }
                     if (true) {
-                        var penek = new CustomUnit("Locator7");
+                        var boss = new CustomUnit("Locator7");
 
                         for (var c = 0; c < 3; c++) {
-                            var modelDocument = SolidWorksApi.InsertComponent(penek, this.solidWorks, assemblyDocument);
-                            var componentsList = SolidWorksApi.FindComponents(penek, assemblyDocument);
+                            var modelDocument = SolidWorksApi.InsertComponent(boss, this.solidWorks, assemblyDocument);
+                            var componentsList = SolidWorksApi.FindComponents(boss, assemblyDocument, c + 1);
                             var component = componentsList[0];
                             var targetFace = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(component), new Point(0, 1, 0));
                             var isDone = SolidWorksApi.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
 
+                            insertedComponentsList.Add(boss);
                             isSmthChanged = true;
                         }
                     }
@@ -140,6 +146,8 @@ namespace Course
                     Message.Error("Выбранные плоскости не удовлетворяют заданию!");
                 }
 
+                Message.Info("Выполнение алгоритма завершено!");
+                document.IActiveView.Activate();
                 if (isSmthChanged) {
                     var key = Input.Key("Нажмите [Space], чтобы закрыть все документы деталей и сборок..");
 

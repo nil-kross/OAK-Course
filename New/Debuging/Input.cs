@@ -11,7 +11,7 @@ namespace Course.Debug {
 
             Typewriter.Output(textString, ConsoleColor.White);
             consoleKey = Console.ReadKey().Key;
-            Console.WriteLine();
+            Console.WriteLine(">>> {0}", consoleKey.ToString());
 
             return consoleKey;
         }

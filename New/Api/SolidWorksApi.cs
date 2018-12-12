@@ -39,6 +39,7 @@ namespace Course.Api
 
             if (solidWorks != null) {
                 try {
+                    Message.Text("Пытаюсь открыть сборку " + fileNamePathway + "..");
                     modelDocument = solidWorks.OpenDoc(fileNamePathway, (Int32)documentType);
                 } catch {
                     Message.Error("Не удалось открыть указанный файл!");
@@ -67,22 +68,23 @@ namespace Course.Api
             return assemblyDocument;
         }
 
-        public static Boolean TryGetActiveAssembly(SW solidWorks, ref AssemblyDoc assemblyDocument, ref SelectionMgr selectionManager)
+        public static Boolean TryGetActiveAssembly(SW solidWorks, ref AssemblyDoc assemblyDocument, ref SelectionMgr selectionManager, ref ModelDoc2 modelDocument)
         {
             var isDone = false;
 
             if (solidWorks != null) {
                 isDone = true;
+
                 try
                 {
-                    ModelDoc2 solidWorksDocument = null;
                     ModelView myModelView = null;
 
-                    solidWorksDocument = ((ModelDoc2)(solidWorks.ActiveDoc));
-                    myModelView = ((ModelView)(solidWorksDocument.ActiveView));
-                    myModelView.FrameState = ((int)(swWindowState_e.swWindowMaximized));
-                    assemblyDocument = ((AssemblyDoc)(solidWorksDocument));
-                    selectionManager = solidWorksDocument.SelectionManager;
+                    modelDocument = (ModelDoc2)(solidWorks.ActiveDoc);
+                    assemblyDocument = (AssemblyDoc)(modelDocument);
+                    selectionManager = modelDocument.SelectionManager;
+
+                    myModelView = (ModelView)(modelDocument.ActiveView);
+                    myModelView.FrameState = (Int32)(swWindowState_e.swWindowMaximized);
                 }
                 catch
                 {
@@ -90,6 +92,7 @@ namespace Course.Api
                     isDone = false;
                     assemblyDocument = null;
                     selectionManager = null;
+                    modelDocument = null;
                 }
             }
 
@@ -129,9 +132,10 @@ namespace Course.Api
             if (File.Exists(filePathway)) {
                 modelDocument = solidWorks.OpenDoc6(filePathway, 1, 1, "", ref errorValue, ref warningValue);
                 if (modelDocument != null) {
-                    assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
 
                     try {
+                        Message.Text("Пытаюсь вставить компонент " + filePathway + "..");
+                        assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
                         modelDocument.EditCopy();
                         //modelDocument.Close();
                     } catch {}
@@ -255,7 +259,7 @@ namespace Course.Api
             return isEqual;
         }
 
-        public static IList<Component2> FindComponents(String fileName, AssemblyDoc assemblyDocument) {
+        public static IList<Component2> FindComponents(String fileName, AssemblyDoc assemblyDocument, Int32? orderNumber = null) {
             IList<Component2> components = null;
 
             if (assemblyDocument != null) {
@@ -265,7 +269,9 @@ namespace Course.Api
                     var currComponent = componentObject as Component2;
 
                     if (componentObject != null) {
-                        if (currComponent.Name.Contains(fileName)) {
+                        var componentString = String.Format("{0}{2}{1}", fileName, orderNumber != null ? orderNumber.ToString() : "", orderNumber != null ? "-" : "");
+
+                        if (currComponent.Name.Contains(componentString)) {
                             if (components == null) {
                                 components = new List<Component2>();
                             }
@@ -281,8 +287,8 @@ namespace Course.Api
             return components;
         }
 
-        public static IList<Component2> FindComponents(Component component, AssemblyDoc assemblyDocument) {
-            return SolidWorksApi.FindComponents(component.FileName, assemblyDocument);
+        public static IList<Component2> FindComponents(Component component, AssemblyDoc assemblyDocument, Int32? orderNumber = null) {
+            return SolidWorksApi.FindComponents(component.FileName, assemblyDocument, orderNumber);
         }
 
         public static Boolean Mate(Face2 one, Face2 another, Mates mate, Aligns align, AssemblyDoc assemblyDocument) {
@@ -294,11 +300,15 @@ namespace Course.Api
                     ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(one, null);
                     ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(another, null);
 
+                    Message.Text(String.Format("Пытаюсь выполнить сопряжение {0}..", mate.ToString()));
                     if (true) {
                         Int32 statusValue = 0;
                         Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3((Int32)mate, (Int32)align, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, out statusValue)));
 
                         isDone = statusValue == 1;
+                        if (!isDone) {
+                            Message.Error("Не удалось выполнить сопряжение!");
+                        }
                     }
                 } else {
                     Message.Error("Одна из граней была null!");

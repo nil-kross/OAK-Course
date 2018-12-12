@@ -35,7 +35,13 @@ namespace Course.Debug {
             var format = "[hh:mm.ss] ";
 
             if (isTimeStamp) {
-                Typewriter.Write(DateTime.Now.ToString("[hh:mm.ss] "), ConsoleColor.DarkGray);
+                Typewriter.Write("[", ConsoleColor.White);
+                Typewriter.Write(DateTime.Now.ToString("hh"), ConsoleColor.DarkGray);
+                Typewriter.Write(":", ConsoleColor.White);
+                Typewriter.Write(DateTime.Now.ToString("mm"), ConsoleColor.DarkGray);
+                Typewriter.Write(".", ConsoleColor.White);
+                Typewriter.Write(DateTime.Now.ToString("ss"), ConsoleColor.Gray);
+                Typewriter.Write("] ", ConsoleColor.White);
             } else {
                 var emptyString = "";
 
