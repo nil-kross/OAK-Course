@@ -1,12 +1,7 @@
 ﻿using SolidWorks.Interop.sldworks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Course.Api
-{
+namespace Course.Api {
     public class Cylinder : BaseSurface
     {
         public Point Origin
@@ -39,7 +34,7 @@ namespace Course.Api
 
         public Cylinder(IFace2 face) : base(face) {}
 
-        public override string ToString()
+        public override String ToString()
         {
             return this.surface != null ? String.Format("R: {2}, Origin: {0}, Axis: {1}", this.Origin, this.Axis, this.Radius) : null;
         }

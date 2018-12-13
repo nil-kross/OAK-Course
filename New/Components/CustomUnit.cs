@@ -5,7 +5,7 @@ namespace Course.Components {
     {
         private readonly String fileNameString = null;
 
-        public override string File
+        public override String File
         {
             get { return this.fileNameString; }
         }

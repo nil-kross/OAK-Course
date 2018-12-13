@@ -2,17 +2,12 @@
 using Course.Components;
 using Course.Debug;
 using SolidWorks.Interop.sldworks;
-using SolidWorks.Interop.swconst;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Component = Course.Components.Component;
-using SolidWorks = SolidWorks.Interop.sldworks.SldWorks;
 
-namespace Course
-{
+namespace Course {
     public class Application
     {
         private SolidWorksApi api = null;
@@ -40,25 +35,25 @@ namespace Course
                 Face2 second = null; // Отв. 2 // Опроная 2
                 Face2 third = null; // Пл-ть // Уст. база
 
-                while (!api.TryGetActiveAssembly()) {
-                    var assemblyDocument = (AssemblyDoc)api.OpenDocument(new ExampleAssembly(), DocumentTypes.Assembly);
+                while (!this.api.TryGetActiveAssembly()) {
+                    var assemblyDocument = (AssemblyDoc)this.api.OpenDocument(new ExampleAssembly(), DocumentTypes.Assembly);
 
                     if (assemblyDocument == null) {
                         Message.Warning("не удалось открыть сборку " + assembly.Pathway + "!");
                         Message.Info("Создаю новую сборку..");
-                        api.CreateNewAssembly();
+                        this.api.CreateNewAssembly();
                     } else {
                         Message.Info("Удалось открыть сборку " + assembly.Pathway + "!");
                     }
                 }
 
-                while (api.GetSelectedObjects() == null) {
+                while (this.api.GetSelectedObjects() == null) {
                     Message.Warning("Не удалось найти выбранные плоскости!");
                     Input.Key("Выберите плоскости:" + System.Environment.NewLine + "[Продолжить]");
                 }
 
                 {
-                    var selectedObjectsList = api.GetSelectedObjects();
+                    var selectedObjectsList = this.api.GetSelectedObjects();
 
                     if (selectedObjectsList != null) {
                         foreach (var obj in selectedObjectsList) {
@@ -96,47 +91,49 @@ namespace Course
                     var boss = new CustomUnit("Locator7");
 
                     if (true) {
-                        var modelDocument = api.InsertComponent(finger);
-                        var componentsList = api.FindComponents(finger);
+                        var modelDocument = this.api.InsertComponent(finger);
+                        var componentsList = this.api.FindComponents(finger);
                         var component = componentsList.FirstOrDefault();
-                        var targetFace = api.FindCylinderByParams(api.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
-                        var isDone = api.Mate(first, targetFace, Mates.Concentric, Aligns.AntiAlign);
+                        var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
+                        var isDone = this.api.Mate(first, targetFace, Mates.Concentric, Aligns.AntiAlign);
                         if (true) {
-                            var plane = api.FindPlaneByParams(api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
-                            api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
+                            var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
+                            this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                         }
 
                         var cylinder = new Cylinder(first);
                         {
-                            api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                            this.api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
                         }
                         insertedComponentsList.Add(finger);
                         isSmthChanged = true;
                     }
                     if (true) {
-                        var modelDocument = api.InsertComponent(prism);
-                        var componentsList = api.FindComponents(prism);
+                        var modelDocument = this.api.InsertComponent(prism);
+                        var componentsList = this.api.FindComponents(prism);
                         var component = componentsList.FirstOrDefault();
-                        var targetFace = api.FindCylinderByParams(api.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
-                        var isDone = api.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign);
-                        if (true) {var plane = api.FindPlaneByParams(api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
-                            api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
+                        var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
+                        var isDone = this.api.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign);
+                        if (true) {
+                            var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
+
+                            this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                         }
 
                         var cylinder = new Cylinder(second);
                         {
-                            api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                            this.api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
                         }
                         insertedComponentsList.Add(prism);
                         isSmthChanged = true;
                     }
                     if (true) {
                         for (var c = 0; c < 3; c++) {
-                            var modelDocument = api.InsertComponent(boss);
-                            var componentsList = api.FindComponents(boss, c + 1);
+                            var modelDocument = this.api.InsertComponent(boss);
+                            var componentsList = this.api.FindComponents(boss, c + 1);
                             var component = componentsList.FirstOrDefault();
-                            var targetFace = api.FindPlaneByNormal(api.GetFaces(component), new Point(0, 1, 0));
-                            var isDone = api.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign);
+                            var targetFace = this.api.FindPlaneByNormal(this.api.GetFaces(component), new Point(0, 1, 0));
+                            var isDone = this.api.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign);
 
                             insertedComponentsList.Add(boss);
                             isSmthChanged = true;
@@ -155,7 +152,7 @@ namespace Course
                     }
 
                     Message.Info("Закрываю все документы деталей и сборок..");
-                    api.CloseAssemblies();
+                    this.api.CloseAssemblies();
                 }
             }
         }

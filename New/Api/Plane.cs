@@ -1,12 +1,7 @@
 ﻿using SolidWorks.Interop.sldworks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Course.Api
-{
+namespace Course.Api {
     public class Plane : BaseSurface
     {
         public Point Normal
@@ -30,7 +25,7 @@ namespace Course.Api
 
         public Plane(IFace2 face) : base(face) {}
 
-        public override string ToString()
+        public override String ToString()
         {
             return this.surface != null ? String.Format("Normal: {0}, Root: {1}", this.Normal, this.Root) : "null";
         }

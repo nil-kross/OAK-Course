@@ -1,12 +1,6 @@
 ﻿using SolidWorks.Interop.sldworks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Course.Api
-{
+namespace Course.Api {
     public class BaseSurface
     {
         protected readonly IFace2 face = null;

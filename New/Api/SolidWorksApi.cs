@@ -43,27 +43,27 @@ namespace Course.Api {
         {
             var isDone = false;
 
-            if (solidWorks != null)
+            if (this.solidWorks != null)
             {
                 try
                 {
                     ModelView myModelView = null;
 
                     isDone = true;
-                    modelDocument = (ModelDoc2)(solidWorks.ActiveDoc);
-                    assemblyDocument = (AssemblyDoc)(modelDocument);
-                    selectionManager = modelDocument.SelectionManager;
+                    this.modelDocument = (ModelDoc2)(this.solidWorks.ActiveDoc);
+                    this.assemblyDocument = (AssemblyDoc)(this.modelDocument);
+                    this.selectionManager = this.modelDocument.SelectionManager;
 
-                    myModelView = (ModelView)(modelDocument.ActiveView);
+                    myModelView = (ModelView)(this.modelDocument.ActiveView);
                     myModelView.FrameState = (Int32)(swWindowState_e.swWindowMaximized);
                 }
                 catch
                 {
                     Message.Error("Не удалось получить активную сборку!");
                     isDone = false;
-                    assemblyDocument = null;
-                    selectionManager = null;
-                    modelDocument = null;
+                    this.assemblyDocument = null;
+                    this.selectionManager = null;
+                    this.modelDocument = null;
                 }
             }
 
@@ -72,21 +72,21 @@ namespace Course.Api {
 
         public AssemblyDoc CreateNewAssembly()
         {
-            return solidWorks.INewAssembly();
+            return this.solidWorks.INewAssembly();
         }
 
         public Boolean CloseAssemblies()
         {
-            return solidWorks.CloseAllDocuments(true);
+            return this.solidWorks.CloseAllDocuments(true);
         }
 
         public IList<Object> GetSelectedObjects()
         {
             IList<Object> selectedObjectsList = null;
 
-            if (selectionManager != null)
+            if (this.selectionManager != null)
             {
-                Int32 selectedObjectsAmount = selectionManager.GetSelectedObjectCount();
+                Int32 selectedObjectsAmount = this.selectionManager.GetSelectedObjectCount();
 
                 if (selectedObjectsAmount > 0)
                 {
@@ -94,7 +94,7 @@ namespace Course.Api {
                 }
                 for (Int32 i = 1; i <= selectedObjectsAmount; i++)
                 {
-                    Object selectedObject = selectionManager.GetSelectedObject(i);
+                    Object selectedObject = this.selectionManager.GetSelectedObject(i);
 
                     selectedObjectsList[i - 1] = selectedObject;
                 }
@@ -196,16 +196,16 @@ namespace Course.Api {
         public Boolean Mate(Face2 one, Face2 another, Mates mate, Aligns align) {
             var isDone = false;
 
-            if (assemblyDocument != null) {
+            if (this.assemblyDocument != null) {
                 if (one != null && another != null) {
-                    (assemblyDocument as ModelDoc2).ClearSelection();
-                    ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(one, null);
-                    ((assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(another, null);
+                    (this.assemblyDocument as ModelDoc2).ClearSelection();
+                    ((this.assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(one, null);
+                    ((this.assemblyDocument as ModelDoc2).SelectionManager as SelectionMgr).AddSelectionListObject(another, null);
 
                     Message.Text(String.Format("Пытаюсь выполнить сопряжение {0}..", mate.ToString()));
                     if (true) {
                         Int32 statusValue = 0;
-                        Mate2 myMate = ((Mate2)(assemblyDocument.AddMate3((Int32)mate, (Int32)align, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, out statusValue)));
+                        Mate2 myMate = ((Mate2)(this.assemblyDocument.AddMate3((Int32)mate, (Int32)align, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, out statusValue)));
 
                         isDone = statusValue == 1;
                         if (!isDone) {
@@ -226,12 +226,12 @@ namespace Course.Api {
         {
             ModelDoc2 modelDocument = null;
 
-            if (solidWorks != null)
+            if (this.solidWorks != null)
             {
                 try
                 {
                     Message.Text("Пытаюсь открыть сборку " + filePathway + "..");
-                    modelDocument = solidWorks.OpenDoc(filePathway, (Int32)documentType);
+                    modelDocument = this.solidWorks.OpenDoc(filePathway, (Int32)documentType);
                 }
                 catch
                 {
@@ -251,14 +251,14 @@ namespace Course.Api {
 
             if (File.Exists(filePathway))
             {
-                modelDocument = solidWorks.OpenDoc6(filePathway, 1, 1, "", ref errorValue, ref warningValue);
+                modelDocument = this.solidWorks.OpenDoc6(filePathway, 1, 1, "", ref errorValue, ref warningValue);
                 if (modelDocument != null)
                 {
 
                     try
                     {
                         Message.Text("Пытаюсь вставить компонент из файла '" + filePathway + "'..");
-                        assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
+                        this.assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
                         modelDocument.EditCopy();
                     }
                     catch {
@@ -353,8 +353,8 @@ namespace Course.Api {
         protected IList<Component2> FindComponents(String fileName, Int32? orderNumber = null) {
             IList<Component2> components = null;
 
-            if (assemblyDocument != null) {
-                Object[] objectsArray = assemblyDocument.GetComponents(true);
+            if (this.assemblyDocument != null) {
+                Object[] objectsArray = this.assemblyDocument.GetComponents(true);
 
                 foreach (Object componentObject in objectsArray) {
                     var currComponent = componentObject as Component2;
