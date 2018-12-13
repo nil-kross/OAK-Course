@@ -144,7 +144,7 @@ namespace Course.Api {
                 return false;
             };
 
-            return this.FindFaces(faces, (face) => true).FirstOrDefault();
+            return this.FindFaces(faces, searchPredicate).FirstOrDefault();
         }
 
         public Face2 FindCylinderByParams(IEnumerable<Face2> faces, Double[] cylinderParams) {
