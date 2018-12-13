@@ -108,16 +108,16 @@ namespace Course
                         var componentsList = SolidWorksApi.FindComponents(finger, assemblyDocument);
                         var component = componentsList.FirstOrDefault();
                         var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
-                        var cylinder = new Cylinder(first);
-                        {
-                            SolidWorksApi.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
-                        }
                         var isDone = SolidWorksApi.Mate(first, targetFace, Mates.Concentric, Aligns.AntiAlign, assemblyDocument);
                         if (true) {
                             var plane = SolidWorksApi.FindPlane(SolidWorksApi.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
                             SolidWorksApi.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
                         }
 
+                        var cylinder = new Cylinder(first);
+                        {
+                            SolidWorksApi.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                        }
                         insertedComponentsList.Add(finger);
                         isSmthChanged = true;
                     }
@@ -126,14 +126,14 @@ namespace Course
                         var componentsList = SolidWorksApi.FindComponents(prism, assemblyDocument);
                         var component = componentsList.FirstOrDefault();
                         var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
+                        var isDone = SolidWorksApi.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign, assemblyDocument);
+                        if (true) {var plane = SolidWorksApi.FindPlane(SolidWorksApi.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
+                            SolidWorksApi.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
+                        }
+
                         var cylinder = new Cylinder(second);
                         {
                             SolidWorksApi.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
-                        }
-                        var isDone = SolidWorksApi.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign, assemblyDocument);
-
-                        if (true) {var plane = SolidWorksApi.FindPlane(SolidWorksApi.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
-                            SolidWorksApi.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
                         }
                         insertedComponentsList.Add(prism);
                         isSmthChanged = true;
