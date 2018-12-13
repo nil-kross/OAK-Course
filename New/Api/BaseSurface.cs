@@ -9,7 +9,7 @@ namespace Course.Api {
         public BaseSurface(IFace2 face)
         {
             this.face = face;
-            this.surface = face.IGetSurface();
+            this.surface = face.GetSurface();
         }
     }
 }

@@ -36,14 +36,18 @@ namespace Course {
                 Face2 third = null; // Пл-ть // Уст. база
 
                 while (!this.api.TryGetActiveAssembly()) {
-                    var assemblyDocument = (AssemblyDoc)this.api.OpenDocument(new ExampleAssembly(), DocumentTypes.Assembly);
+                    assembly = new ExampleAssembly();
 
-                    if (assemblyDocument == null) {
-                        Message.Warning("не удалось открыть сборку " + assembly.Pathway + "!");
-                        Message.Info("Создаю новую сборку..");
-                        this.api.CreateNewAssembly();
-                    } else {
-                        Message.Info("Удалось открыть сборку " + assembly.Pathway + "!");
+                    {
+                        var assemblyDocument = (AssemblyDoc)this.api.OpenDocument(assembly, DocumentTypes.Assembly);
+
+                        if (assemblyDocument == null) {
+                            Message.Warning("не удалось открыть сборку " + assembly.Pathway + "!");
+                            Message.Info("Создаю новую сборку..");
+                            this.api.CreateNewAssembly();
+                        } else {
+                            Message.Info("Удалось открыть сборку " + assembly.Pathway + "!");
+                        }
                     }
                 }
 

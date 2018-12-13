@@ -123,7 +123,7 @@ namespace Course.Api {
 
         public Face2 FindPlaneByParams(IEnumerable<Face2> faces, Double[] planeParams) {
             Func<Face2, Boolean> searchPredicate = (face) => {
-                var array = face.IGetSurface().PlaneParams;
+                var array = face.GetSurface().PlaneParams;
 
                 return this.CompareParams(planeParams, array, 6);
             };
@@ -133,7 +133,7 @@ namespace Course.Api {
 
         public Face2 FindPlaneByNormal(IEnumerable<Face2> faces, Point normal) {
             Func<Face2, Boolean> searchPredicate = (face) => {
-                if (face.IGetSurface().IsPlane()) {
+                if (face.GetSurface().IsPlane()) {
                     Plane plane = new Plane(face);
 
                     return plane.Normal.X == normal.X &&
@@ -149,7 +149,7 @@ namespace Course.Api {
 
         public Face2 FindCylinderByParams(IEnumerable<Face2> faces, Double[] cylinderParams) {
             Func<Face2, Boolean> searchPredicate = (face) => {
-                var cylinderParamsArray = face.IGetSurface().CylinderParams;
+                var cylinderParamsArray = face.GetSurface().CylinderParams;
 
                 return this.CompareParams(cylinderParams, cylinderParamsArray, 7);
             };
@@ -209,7 +209,7 @@ namespace Course.Api {
 
                         isDone = statusValue == 1;
                         if (!isDone) {
-                            Message.Error("Не удалось выполнить сопряжение!");
+                            Message.Error("Не удалось выполнить сопряжение!\n (Код ошибки: " + statusValue + ")");
                         }
                     }
                 } else {
@@ -360,9 +360,9 @@ namespace Course.Api {
                     var currComponent = componentObject as Component2;
 
                     if (componentObject != null) {
-                        var componentString = String.Format("{0}{2}{1}", fileName, orderNumber != null ? orderNumber.ToString() : "", orderNumber != null ? "-" : "");
+                        var endingString = String.Format("{1}{0}", orderNumber != null ? orderNumber.ToString() : "", orderNumber != null ? "-" : "");
 
-                        if (currComponent.Name.Contains(componentString)) {
+                        if (currComponent.Name.Contains(fileName) && currComponent.Name.Contains(endingString)) {
                             if (components == null) {
                                 components = new List<Component2>();
                             }
