@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Course.Debug {
     public static class Typewriter {
@@ -36,11 +32,11 @@ namespace Course.Debug {
 
             if (isTimeStamp) {
                 Typewriter.Write("[", ConsoleColor.White);
-                Typewriter.Write(DateTime.Now.ToString("hh"), ConsoleColor.DarkGray);
+                Typewriter.Write(DateTime.Now.ToString("hh"), ConsoleColor.Gray);
                 Typewriter.Write(":", ConsoleColor.White);
-                Typewriter.Write(DateTime.Now.ToString("mm"), ConsoleColor.DarkGray);
+                Typewriter.Write(DateTime.Now.ToString("mm"), ConsoleColor.Gray);
                 Typewriter.Write(".", ConsoleColor.White);
-                Typewriter.Write(DateTime.Now.ToString("ss"), ConsoleColor.Gray);
+                Typewriter.Write(DateTime.Now.ToString("ss"), ConsoleColor.DarkGray);
                 Typewriter.Write("] ", ConsoleColor.White);
             } else {
                 var emptyString = "";

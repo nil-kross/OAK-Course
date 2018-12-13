@@ -1,84 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using SW = SolidWorks.Interop.sldworks.SldWorks;
-using SolidWorks.Interop.swconst;
-using Course.Debug;
-using Course.Api;
-using Course.Components;
+﻿using Course.Debug;
 using SolidWorks.Interop.sldworks;
-using Component = Course.Components.Component;
+using SolidWorks.Interop.swconst;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using Component = Course.Components.Component;
+using SW = SolidWorks.Interop.sldworks.SldWorks;
 
-namespace Course.Api
-{
-    public static class SolidWorksApi
+namespace Course.Api {
+    public class SolidWorksApi
     {
         private static String swApplicationNameString = "SldWorks.Application";
 
-        public static SW GetSolidWorks()
+        private SW solidWorks;
+        private AssemblyDoc assemblyDocument;
+        private SelectionMgr selectionManager;
+        private ModelDoc2 modelDocument;
+
+        public static SolidWorksApi GetSolidWorks()
         {
-            SW solidWorks = null;
+            SolidWorksApi api = null;
 
             try
             {
-                solidWorks = (SW)Marshal.GetActiveObject(SolidWorksApi.swApplicationNameString);
+                api = new SolidWorksApi
+                {
+                    solidWorks = (SW)Marshal.GetActiveObject(SolidWorksApi.swApplicationNameString)
+                };
             }
-            catch {
+            catch
+            {
                 Message.Error("Не удалось получить дескриптор приложения SolidWorks!");
+                api = null;
             }
 
-            return solidWorks;
+            return api;
         }
 
-        public static ModelDoc2 OpenDocument(SW solidWorks, DocumentTypes documentType, String fileNamePathway) {
-            ModelDoc2 modelDocument = null;
-
-            if (solidWorks != null) {
-                try {
-                    Message.Text("Пытаюсь открыть сборку " + fileNamePathway + "..");
-                    modelDocument = solidWorks.OpenDoc(fileNamePathway, (Int32)documentType);
-                } catch {
-                    Message.Error("Не удалось открыть указанный файл!");
-                }
-            }
-
-            return modelDocument;
-        }
-
-        public static ModelDoc2 OpenDocument(SW solidWorks, DocumentTypes documentType, Component component)
-        {
-            return SolidWorksApi.OpenDocument(solidWorks, documentType, component.Pathway);
-        }
-
-        public static void CloseAssemblies(SW solidWorks) {
-            solidWorks.CloseAllDocuments(true);
-        }
-
-        public static AssemblyDoc CreateNewAssembly(SW solidWorks) {
-            AssemblyDoc assemblyDocument = null;
-
-            if (solidWorks != null) {
-                assemblyDocument = solidWorks.INewAssembly();
-            }
-
-            return assemblyDocument;
-        }
-
-        public static Boolean TryGetActiveAssembly(SW solidWorks, ref AssemblyDoc assemblyDocument, ref SelectionMgr selectionManager, ref ModelDoc2 modelDocument)
+        public Boolean TryGetActiveAssembly()
         {
             var isDone = false;
 
-            if (solidWorks != null) {
-                isDone = true;
-
+            if (solidWorks != null)
+            {
                 try
                 {
                     ModelView myModelView = null;
 
+                    isDone = true;
                     modelDocument = (ModelDoc2)(solidWorks.ActiveDoc);
                     assemblyDocument = (AssemblyDoc)(modelDocument);
                     selectionManager = modelDocument.SelectionManager;
@@ -99,7 +70,17 @@ namespace Course.Api
             return isDone;
         }
 
-        public static IList<Object> GetSelectedObjects(SelectionMgr selectionManager)
+        public AssemblyDoc CreateNewAssembly()
+        {
+            return solidWorks.INewAssembly();
+        }
+
+        public Boolean CloseAssemblies()
+        {
+            return solidWorks.CloseAllDocuments(true);
+        }
+
+        public IList<Object> GetSelectedObjects()
         {
             IList<Object> selectedObjectsList = null;
 
@@ -117,181 +98,102 @@ namespace Course.Api
 
                     selectedObjectsList[i - 1] = selectedObject;
                 }
+            } else
+            {
+                Message.Error("Selection manager имеет значение null!");
             }
-            
+
             return selectedObjectsList;
         }
 
-        public static ModelDoc2 InsertComponent(String filePathway, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null)
+        public ModelDoc2 OpenDocument(String filePathway, DocumentTypes documentType)
         {
-            Point centerPoint = point ?? new Point();
-            Int32 errorValue = 0;
-            Int32 warningValue = 0;
-            ModelDoc2 modelDocument = null;
+            return this.OpenDocumentByFilePathway(filePathway, documentType);
+        }
 
-            if (File.Exists(filePathway)) {
-                modelDocument = solidWorks.OpenDoc6(filePathway, 1, 1, "", ref errorValue, ref warningValue);
-                if (modelDocument != null) {
+        public ModelDoc2 OpenDocument(Component component, DocumentTypes documentType)
+        {
+            return this.OpenDocumentByFilePathway(component.Pathway, documentType);
+        }
 
-                    try {
-                        Message.Text("Пытаюсь вставить компонент " + filePathway + "..");
-                        assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
-                        modelDocument.EditCopy();
-                        //modelDocument.Close();
-                    } catch {}
-                } else {
-                    Message.Error("Не удалось открыть деталь из файла '" + filePathway + "'!");
+        public ModelDoc2 InsertComponent(Component component, Point point = null)
+        {
+            return this.InsertComponentByFilePathway(component.Pathway, point);
+        }
+
+        public Face2 FindPlaneByParams(IEnumerable<Face2> faces, Double[] planeParams) {
+            Func<Face2, Boolean> searchPredicate = (face) => {
+                var array = face.IGetSurface().PlaneParams;
+
+                return this.CompareParams(planeParams, array, 6);
+            };
+
+            return this.FindFaces(faces, searchPredicate).FirstOrDefault();
+        }
+
+        public Face2 FindPlaneByNormal(IEnumerable<Face2> faces, Point normal) {
+            Func<Face2, Boolean> searchPredicate = (face) => {
+                if (face.IGetSurface().IsPlane()) {
+                    Plane plane = new Plane(face);
+
+                    return plane.Normal.X == normal.X &&
+                           plane.Normal.Y == normal.Y &&
+                           plane.Normal.Z == normal.Z;
                 }
-            } else {
-                Message.Error("Файл указанного компонента не найден!");
-            }
 
-            return modelDocument;
+                return false;
+            };
+
+            return this.FindFaces(faces, (face) => true).FirstOrDefault();
         }
 
-        public static ModelDoc2 InsertComponent(Component component, SW solidWorks, AssemblyDoc assemblyDocument, Point point = null) {
-            return SolidWorksApi.InsertComponent(component.Pathway, solidWorks, assemblyDocument, point);
+        public Face2 FindCylinderByParams(IEnumerable<Face2> faces, Double[] cylinderParams) {
+            Func<Face2, Boolean> searchPredicate = (face) => {
+                var cylinderParamsArray = face.IGetSurface().CylinderParams;
+
+                return this.CompareParams(cylinderParams, cylinderParamsArray, 7);
+            };
+
+            return this.FindFaces(faces, searchPredicate).FirstOrDefault();
         }
 
-        public static Face2 FindFace(IEnumerable<Face2> faces, Point normal) {
-            Face2 face = null;
-
-            if (faces != null) {
-                foreach (var currFace in faces) {
-                    var surface = currFace.GetSurface() as Surface;
-
-                    if (!surface.IsCylinder()) {
-                        Double[] normalValuesArray = currFace.Normal;
-
-                        if (SolidWorksApi.CompareParams(normalValuesArray, normal.ToArray(), Point.AxisesCount)) {
-                            face = currFace;
-                        }
-                    }
-                }
-            } else {
-                Message.Error("Перечисление граней было null!");
-            }
-
-            return face;
+        public IEnumerable<Component2> FindComponents(Component component, Int32? orderNumber = null) {
+            return this.FindComponents(component.File, orderNumber);
         }
 
-        public static Face2 FindPlane(IEnumerable<Face2> faces, Double[] etalon) {
-            Face2 face = null;
-
-            if (faces != null) {
-                foreach (var currFace in faces) {
-                    Surface plane = currFace.IGetSurface();
-
-                    if (plane != null && plane.IsPlane()) {
-                        Double[] planeParamsArray = plane.PlaneParams;
-
-                        if (SolidWorksApi.CompareParams(planeParamsArray, etalon, 6)) {
-                            face = currFace;
-                        }
-                    }
-                }
-            } else {
-                Message.Error("Перечисление граней было null!");
-            }
-
-            return face;
-        }
-
-        public static Face2 FindCylinder(IEnumerable<Face2> faces, Double[] etalon) {
-            Face2 face = null;
-
-            if (faces != null) {
-                foreach (var currFace in faces) {
-                    Surface plane = currFace.IGetSurface();
-
-                    if (plane != null && plane.IsCylinder()) {
-                        Double[] planeParamsArray = plane.CylinderParams;
-
-                        if (SolidWorksApi.CompareParams(planeParamsArray, etalon, 7)) {
-                            face = currFace;
-                        }
-                    }
-                }
-            } else {
-                Message.Error("Перечисление граней было null!");
-            }
-
-            return face;
-        }
-
-        public static IEnumerable<Face2> GetFaces(Component2 component) {
-            IList<Face2> facesList = null;
-
+        public void SetEquation(IComponent2 component, Int32 index, Equation equation) {
             if (component != null) {
-                var body = component.GetBody() as Body;
-                var curFace = body.GetFirstFace() as Face2;
+                ModelDoc2 modelDocument = component.GetModelDoc2();
+                EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
 
-                while (curFace != null) {
-                    if (facesList == null) {
-                        facesList = new List<Face2>();
-                    }
-                    facesList.Add(curFace);
+                equationManager.Equation[index] = String.Format("{0}{1}{0}={2}", '"', equation.Name, equation.Value);
 
-                    curFace = curFace.GetNextFace() as Face2;
-                }
+                equationManager.EvaluateAll();
+                modelDocument.EditRebuild3();
+                modelDocument.GraphicsRedraw();
             } else {
                 Message.Error("Компонент был null!");
             }
-
-            return facesList;
         }
 
-        public static Boolean CompareParams(Double[] current, Double[] etalon, Int32 count) {
-            var isEqual = false;
+        public void SetEquations(IComponent2 component, IList<Equation> equations) {
+            if (component != null) {
+                ModelDoc2 modelDocument = component.GetModelDoc2();
+                EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
 
-            if (current.Length == count && etalon.Length == count) {
-                isEqual = true;
-
-                for (var i = 0; i < count; i++) {
-                    if (Math.Abs(current[i] - etalon[i]) > 0.0001f) {
-                        isEqual = false;
-                    }
+                for (var i = 0; i < equations.Count; i++) {
+                    equationManager.Equation[i] = String.Format("{0}{1}{0}={2}", '"', equations[i].Name, equations[i].Value);
                 }
+
+                equationManager.EvaluateAll();
+                modelDocument.EditRebuild3();
+                modelDocument.GraphicsRedraw();
             } else {
-                Message.Error("Параметры имели разную размерность!");
+                Message.Error("Компонент был null!");
             }
-
-            return isEqual;
         }
 
-        public static IList<Component2> FindComponents(String fileName, AssemblyDoc assemblyDocument, Int32? orderNumber = null) {
-            IList<Component2> components = null;
-
-            if (assemblyDocument != null) {
-                Object[] objectsArray = assemblyDocument.GetComponents(true);
-
-                foreach (Object componentObject in objectsArray) {
-                    var currComponent = componentObject as Component2;
-
-                    if (componentObject != null) {
-                        var componentString = String.Format("{0}{2}{1}", fileName, orderNumber != null ? orderNumber.ToString() : "", orderNumber != null ? "-" : "");
-
-                        if (currComponent.Name.Contains(componentString)) {
-                            if (components == null) {
-                                components = new List<Component2>();
-                            }
-                            components.Add(currComponent);
-                            currComponent.MakeVirtual();
-                        }
-                    }
-                }
-            } else {
-                Message.Error("Документ сборки был null!");
-            }
-
-            return components;
-        }
-
-        public static IList<Component2> FindComponents(Component component, AssemblyDoc assemblyDocument, Int32? orderNumber = null) {
-            return SolidWorksApi.FindComponents(component.File, assemblyDocument, orderNumber);
-        }
-
-        public static Boolean Mate(Face2 one, Face2 another, Mates mate, Aligns align, AssemblyDoc assemblyDocument) {
+        public Boolean Mate(Face2 one, Face2 another, Mates mate, Aligns align) {
             var isDone = false;
 
             if (assemblyDocument != null) {
@@ -320,36 +222,160 @@ namespace Course.Api
             return isDone;
         }
 
-        public static void SetEquations(IComponent2 component, IList<Equation> equations) {
-            if (component != null) {
-                ModelDoc2 modelDocument = component.GetModelDoc2();
-                EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
+        protected ModelDoc2 OpenDocumentByFilePathway(String filePathway, DocumentTypes documentType)
+        {
+            ModelDoc2 modelDocument = null;
 
-                for (var i = 0; i < equations.Count; i++) {
-                    equationManager.Equation[i] = String.Format("{0}{1}{0}={2}", '"', equations[i].Name, equations[i].Value);
+            if (solidWorks != null)
+            {
+                try
+                {
+                    Message.Text("Пытаюсь открыть сборку " + filePathway + "..");
+                    modelDocument = solidWorks.OpenDoc(filePathway, (Int32)documentType);
                 }
-
-                equationManager.EvaluateAll();
-                modelDocument.EditRebuild3();
-                modelDocument.GraphicsRedraw();
-            } else {
-                Message.Error("Компонент был null!");
+                catch
+                {
+                    Message.Error("Не удалось открыть указанный файл!");
+                }
             }
+
+            return modelDocument;
         }
 
-        public static void SetEquation(IComponent2 component, Int32 index, Equation equation) {
-            if (component != null) {
-                ModelDoc2 modelDocument = component.GetModelDoc2();
-                EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
+        protected ModelDoc2 InsertComponentByFilePathway(String filePathway, Point point = null)
+        {
+            Point centerPoint = point ?? new Point();
+            Int32 errorValue = 0;
+            Int32 warningValue = 0;
+            ModelDoc2 modelDocument = null;
 
-                equationManager.Equation[index] = String.Format("{0}{1}{0}={2}", '"', equation.Name, equation.Value);
+            if (File.Exists(filePathway))
+            {
+                modelDocument = solidWorks.OpenDoc6(filePathway, 1, 1, "", ref errorValue, ref warningValue);
+                if (modelDocument != null)
+                {
 
-                equationManager.EvaluateAll();
-                modelDocument.EditRebuild3();
-                modelDocument.GraphicsRedraw();
-            } else {
-                Message.Error("Компонент был null!");
+                    try
+                    {
+                        Message.Text("Пытаюсь вставить компонент из файла '" + filePathway + "'..");
+                        assemblyDocument.AddComponent(filePathway, centerPoint.X, centerPoint.Y, centerPoint.Z);
+                        modelDocument.EditCopy();
+                    }
+                    catch {
+                        Message.Error("Не удалось вставить компонент из файла '" + filePathway + "'..");
+                    }
+                }
+                else
+                {
+                    Message.Error("Не удалось открыть деталь из файла '" + filePathway + "'!");
+                }
             }
+            else
+            {
+                Message.Error("Файл указанного компонента не найден!");
+            }
+
+            return modelDocument;
+        }
+
+        protected IList<Face2> FindFaces(IEnumerable<Face2> faces, Func<Face2, Boolean> predicate)
+        {
+            IList<Face2> facesList = null;
+
+            if (faces != null)
+            {
+                foreach (var currFace in faces)
+                {
+                    if (predicate(currFace))
+                    {
+                        if (facesList == null)
+                        {
+                            facesList = new List<Face2>();
+                        }
+                        facesList.Add(currFace);
+                    }
+                }
+            }
+            else
+            {
+                Message.Error("Перечисление граней имело значение null!");
+            }
+
+            return facesList;
+        }
+
+        protected Boolean CompareParams(Double[] current, Double[] etalon, Int32 count)
+        {
+            var isEqual = false;
+
+            if (current.Length == count && etalon.Length == count)
+            {
+                isEqual = true;
+
+                for (var i = 0; i < count; i++)
+                {
+                    if (Math.Abs(current[i] - etalon[i]) > 0.0001f)
+                    {
+                        isEqual = false;
+                    }
+                }
+            }
+            else
+            {
+                Message.Error("Массивы значений имеют разную размерность!");
+            }
+
+            return isEqual;
+        }
+
+        public IEnumerable<Face2> GetFaces(Component2 component) {
+            IList<Face2> facesList = null;
+
+            if (component != null) {
+                var body = component.GetBody() as Body;
+                var curFace = body.GetFirstFace() as Face2;
+
+                while (curFace != null) {
+                    if (facesList == null) {
+                        facesList = new List<Face2>();
+                    }
+                    facesList.Add(curFace);
+
+                    curFace = curFace.GetNextFace() as Face2;
+                }
+            } else {
+                Message.Error("Значение компонента  null!");
+            }
+
+            return facesList;
+        }
+
+        protected IList<Component2> FindComponents(String fileName, Int32? orderNumber = null) {
+            IList<Component2> components = null;
+
+            if (assemblyDocument != null) {
+                Object[] objectsArray = assemblyDocument.GetComponents(true);
+
+                foreach (Object componentObject in objectsArray) {
+                    var currComponent = componentObject as Component2;
+
+                    if (componentObject != null) {
+                        var componentString = String.Format("{0}{2}{1}", fileName, orderNumber != null ? orderNumber.ToString() : "", orderNumber != null ? "-" : "");
+
+                        if (currComponent.Name.Contains(componentString)) {
+                            if (components == null) {
+                                components = new List<Component2>();
+                            }
+                            components.Add(currComponent);
+                            currComponent.MakeVirtual();
+                        }
+                    }
+                }
+            } else {
+                Message.Error("Документ сборки был null!");
+            }
+
+            return components;
         }
     }
 }

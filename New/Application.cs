@@ -9,16 +9,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Component = Course.Components.Component;
-using SW = SolidWorks.Interop.sldworks.SldWorks;
+using SolidWorks = SolidWorks.Interop.sldworks.SldWorks;
 
 namespace Course
 {
     public class Application
     {
-        private SW solidWorks = null;
+        private SolidWorksApi api = null;
 
-        public Application()
-        {
+        public Application() {
+            this.api = SolidWorksApi.GetSolidWorks();
+            while (this.api == null) {
+                Message.Info("Пожалуйста, запустите приложение SolidWorks.");
+                Input.Key("После этого, нажмите любую клавишу для продолжения..");
+            }
         }
 
         public void Start()
@@ -26,47 +30,35 @@ namespace Course
             var insertedComponentsList = new List<Component>();
             var isSmthChanged = false;
 
-            this.solidWorks = SolidWorksApi.GetSolidWorks();
-            while (this.solidWorks == null) {
-                Message.Info("Пожалуйста, запустите приложение SolidWorks.");
-                Input.Key("После этого, нажмите любую клавишу для продолжения..");
-            }
-
-            if (this.solidWorks == null)
+            if (this.api == null)
             {
                 Message.Error("Не удалось получить дескриптор SolidWorks, завершаю выполнение!..");
                 return;
             } else {
                 Assembly assembly = null;
-                AssemblyDoc assemblyDocument = null;
-                SelectionMgr selectionManager = null;
-                ModelDoc2 document = null;
                 Face2 first = null; // Отв.1 // Опорная
                 Face2 second = null; // Отв. 2 // Опроная 2
                 Face2 third = null; // Пл-ть // Уст. база
 
-                while (!SolidWorksApi.TryGetActiveAssembly(this.solidWorks, ref assemblyDocument, ref selectionManager, ref document)) {
-                    assembly = new ExampleAssembly();
-                    assemblyDocument = (AssemblyDoc)SolidWorksApi.OpenDocument(this.solidWorks, DocumentTypes.Assembly, assembly);
+                while (!api.TryGetActiveAssembly()) {
+                    var assemblyDocument = (AssemblyDoc)api.OpenDocument(new ExampleAssembly(), DocumentTypes.Assembly);
 
                     if (assemblyDocument == null) {
                         Message.Warning("не удалось открыть сборку " + assembly.Pathway + "!");
                         Message.Info("Создаю новую сборку..");
-                        SolidWorksApi.CreateNewAssembly(this.solidWorks);
+                        api.CreateNewAssembly();
                     } else {
                         Message.Info("Удалось открыть сборку " + assembly.Pathway + "!");
                     }
                 }
 
-                while (SolidWorksApi.GetSelectedObjects(selectionManager) == null) {
+                while (api.GetSelectedObjects() == null) {
                     Message.Warning("Не удалось найти выбранные плоскости!");
                     Input.Key("Выберите плоскости:" + System.Environment.NewLine + "[Продолжить]");
                 }
 
-                if (selectionManager == null) {
-                    Message.Error("Selection Manager был null!");
-                } else {
-                    var selectedObjectsList = SolidWorksApi.GetSelectedObjects(selectionManager);
+                {
+                    var selectedObjectsList = api.GetSelectedObjects();
 
                     if (selectedObjectsList != null) {
                         foreach (var obj in selectedObjectsList) {
@@ -104,47 +96,47 @@ namespace Course
                     var boss = new CustomUnit("Locator7");
 
                     if (true) {
-                        var modelDocument = SolidWorksApi.InsertComponent(finger, this.solidWorks, assemblyDocument);
-                        var componentsList = SolidWorksApi.FindComponents(finger, assemblyDocument);
+                        var modelDocument = api.InsertComponent(finger);
+                        var componentsList = api.FindComponents(finger);
                         var component = componentsList.FirstOrDefault();
-                        var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
-                        var isDone = SolidWorksApi.Mate(first, targetFace, Mates.Concentric, Aligns.AntiAlign, assemblyDocument);
+                        var targetFace = api.FindCylinderByParams(api.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
+                        var isDone = api.Mate(first, targetFace, Mates.Concentric, Aligns.AntiAlign);
                         if (true) {
-                            var plane = SolidWorksApi.FindPlane(SolidWorksApi.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
-                            SolidWorksApi.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
+                            var plane = api.FindPlaneByParams(api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
+                            api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                         }
 
                         var cylinder = new Cylinder(first);
                         {
-                            SolidWorksApi.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                            api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
                         }
                         insertedComponentsList.Add(finger);
                         isSmthChanged = true;
                     }
                     if (true) {
-                        var modelDocument = SolidWorksApi.InsertComponent(prism, this.solidWorks, assemblyDocument);
-                        var componentsList = SolidWorksApi.FindComponents(prism, assemblyDocument);
+                        var modelDocument = api.InsertComponent(prism);
+                        var componentsList = api.FindComponents(prism);
                         var component = componentsList.FirstOrDefault();
-                        var targetFace = SolidWorksApi.FindCylinder(SolidWorksApi.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
-                        var isDone = SolidWorksApi.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign, assemblyDocument);
-                        if (true) {var plane = SolidWorksApi.FindPlane(SolidWorksApi.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
-                            SolidWorksApi.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
+                        var targetFace = api.FindCylinderByParams(api.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
+                        var isDone = api.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign);
+                        if (true) {var plane = api.FindPlaneByParams(api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
+                            api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                         }
 
                         var cylinder = new Cylinder(second);
                         {
-                            SolidWorksApi.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                            api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
                         }
                         insertedComponentsList.Add(prism);
                         isSmthChanged = true;
                     }
                     if (true) {
                         for (var c = 0; c < 3; c++) {
-                            var modelDocument = SolidWorksApi.InsertComponent(boss, this.solidWorks, assemblyDocument);
-                            var componentsList = SolidWorksApi.FindComponents(boss, assemblyDocument, c + 1);
+                            var modelDocument = api.InsertComponent(boss);
+                            var componentsList = api.FindComponents(boss, c + 1);
                             var component = componentsList.FirstOrDefault();
-                            var targetFace = SolidWorksApi.FindFace(SolidWorksApi.GetFaces(component), new Point(0, 1, 0));
-                            var isDone = SolidWorksApi.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign, assemblyDocument);
+                            var targetFace = api.FindPlaneByNormal(api.GetFaces(component), new Point(0, 1, 0));
+                            var isDone = api.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign);
 
                             insertedComponentsList.Add(boss);
                             isSmthChanged = true;
@@ -155,7 +147,6 @@ namespace Course
                 }
 
                 Message.Info("Выполнение алгоритма завершено!");
-                document.IActiveView.Activate();
                 if (isSmthChanged) {
                     var key = Input.Key("Нажмите [Space], чтобы закрыть все документы деталей и сборок..");
 
@@ -164,7 +155,7 @@ namespace Course
                     }
 
                     Message.Info("Закрываю все документы деталей и сборок..");
-                    SolidWorksApi.CloseAssemblies(this.solidWorks);
+                    api.CloseAssemblies();
                 }
             }
         }
