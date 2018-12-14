@@ -15,8 +15,8 @@ namespace Course {
         public Application() {
             this.api = SolidWorksApi.GetSolidWorks();
             while (this.api == null) {
-                Message.Info("Пожалуйста, запустите приложение SolidWorks.");
-                Input.Key("После этого, нажмите любую клавишу для продолжения..");
+                Message.Info("Пожалуйста, запустите приложение SolidWorks..");
+                Input.Key("[Продолжить]");
             }
         }
 
@@ -53,7 +53,7 @@ namespace Course {
 
                 while (this.api.GetSelectedObjects() == null) {
                     Message.Warning("Не удалось найти выбранные плоскости!");
-                    Input.Key("Выберите плоскости:" + System.Environment.NewLine + "[Продолжить]");
+                    Input.Key("Пожалуйства, выберите плоскости!" + System.Environment.NewLine + "[Продолжить]");
                 }
 
                 {
@@ -149,13 +149,12 @@ namespace Course {
 
                 Message.Info("Выполнение алгоритма завершено!");
                 if (isSmthChanged) {
-                    var key = Input.Key("Нажмите [Space], чтобы закрыть все документы деталей и сборок..");
-
-                    if (key != ConsoleKey.Spacebar) {
+                    Message.Text("Нажмите [Space], чтобы закрыть все открытые документы деталей и сборок..");
+                    if (ConsoleKey.Spacebar != Input.Key("[Продолжить]")) {
                         return;
                     }
 
-                    Message.Info("Закрываю все документы деталей и сборок..");
+                    Message.Info("Закрываю все открытые документы деталей и сборок..");
                     this.api.CloseAssemblies();
                 }
             }
