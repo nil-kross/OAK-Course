@@ -104,10 +104,12 @@ namespace Course {
                             var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
                             this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                         }
-
                         var cylinder = new Cylinder(first);
                         {
-                            this.api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                            this.api.SetEquation(component, new Equation() {
+                                Name = "D",
+                                Value = cylinder.Radius * 2 * 1000
+                            });
                         }
                         insertedComponentsList.Add(finger);
                         isSmthChanged = true;
@@ -123,10 +125,12 @@ namespace Course {
 
                             this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                         }
-
                         var cylinder = new Cylinder(second);
                         {
-                            this.api.SetEquation(component, 1, new Equation() { Name = "D", Value = cylinder.Radius * 2 * 1000 });
+                            this.api.SetEquation(component, new Equation() {
+                                Name = "D",
+                                Value = cylinder.Radius * 2 * 1000
+                            });
                         }
                         insertedComponentsList.Add(prism);
                         isSmthChanged = true;
@@ -138,7 +142,12 @@ namespace Course {
                             var component = componentsList.FirstOrDefault();
                             var targetFace = this.api.FindPlaneByNormal(this.api.GetFaces(component), new Point(0, 1, 0));
                             var isDone = this.api.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign);
-
+                            {
+                                this.api.SetEquation(component, new Equation() {
+                                    Name = "",
+                                    Value = 1
+                                });
+                            }
                             insertedComponentsList.Add(boss);
                             isSmthChanged = true;
                         }

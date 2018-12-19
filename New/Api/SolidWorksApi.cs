@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Component = Course.Components.Component;
 using SW = SolidWorks.Interop.sldworks.SldWorks;
 
@@ -161,16 +162,37 @@ namespace Course.Api {
             return this.FindComponents(component.File, orderNumber);
         }
 
-        public void SetEquation(IComponent2 component, Int32 index, Equation equation) {
+        public void SetEquation(IComponent2 component, Equation equation) {
             if (component != null) {
                 ModelDoc2 modelDocument = component.GetModelDoc2();
                 EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
 
-                equationManager.Equation[index] = String.Format("{0}{1}{0}={2}", '"', equation.Name, equation.Value);
+                {
+                    var regex = new Regex("(.*)=.*");
 
-                equationManager.EvaluateAll();
-                modelDocument.EditRebuild3();
-                modelDocument.GraphicsRedraw();
+                    for (var i = 0; i < 10; i++) {
+                        var isFounded = false;
+
+                        try {
+                            var equationString = equationManager.Equation[i];
+                            var matchString = regex.Match(equationString).Groups[1].Value;
+
+                            if (matchString.Contains(equation.Name)) {
+                                isFounded = true;
+                            }
+                        } catch {}
+
+                        if (isFounded) {
+                            equationManager.Equation[i] = String.Format("{0}{1}{0}={2}", '"', equation.Name, equation.Value);
+
+                            equationManager.EvaluateAll();
+                            modelDocument.EditRebuild3();
+                            modelDocument.GraphicsRedraw();
+
+                            return;
+                        }
+                    }
+                }
             } else {
                 Message.Error("Компонент был null!");
             }
@@ -178,16 +200,9 @@ namespace Course.Api {
 
         public void SetEquations(IComponent2 component, IList<Equation> equations) {
             if (component != null) {
-                ModelDoc2 modelDocument = component.GetModelDoc2();
-                EquationMgr equationManager = ((IModelDoc2)modelDocument).GetEquationMgr();
-
-                for (var i = 0; i < equations.Count; i++) {
-                    equationManager.Equation[i] = String.Format("{0}{1}{0}={2}", '"', equations[i].Name, equations[i].Value);
+                foreach (var equation in equations) {
+                    this.SetEquation(component, equation);
                 }
-
-                equationManager.EvaluateAll();
-                modelDocument.EditRebuild3();
-                modelDocument.GraphicsRedraw();
             } else {
                 Message.Error("Компонент был null!");
             }
