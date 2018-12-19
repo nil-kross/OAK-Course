@@ -237,6 +237,38 @@ namespace Course.Api {
             return isDone;
         }
 
+        public static Bounds GetBounds(Face2 face) {
+            Double[] boundsArray = face.GetUVBounds();
+
+            return new Bounds {
+                U = boundsArray[1] - boundsArray[0],
+                V = boundsArray[3] - boundsArray[2]
+            };
+        }
+
+        public static Boolean Compare(Face2 first, Face2 second) {
+            Func<Face2, Double> func = face => {
+                Double value = 0;
+
+                if (face.IGetSurface().IsPlane()) {
+                    Bounds bounds = SolidWorksApi.GetBounds(face);
+
+                    value = Math.Sqrt(Math.Pow(bounds.U, 2) + Math.Pow(bounds.V, 2));
+                }
+                if (face.IGetSurface().IsCylinder()) {
+                    Bounds bounds = SolidWorksApi.GetBounds(face);
+
+                    value = bounds.V;
+                }
+
+                return value;
+            };
+            Double firstValue = func(first);
+            Double secondValue = func(second);
+
+            return firstValue > secondValue;
+        }
+
         protected ModelDoc2 OpenDocumentByFilePathway(String filePathway, DocumentTypes documentType)
         {
             ModelDoc2 modelDocument = null;

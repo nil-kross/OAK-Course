@@ -1,4 +1,5 @@
 ﻿using SolidWorks.Interop.sldworks;
+using System;
 
 namespace Course.Api {
     public class BaseSurface

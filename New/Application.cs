@@ -57,6 +57,8 @@ namespace Course {
                 }
 
                 {
+                    var cylinderFacesList = new List<Face2>();
+                    var planeFacesList = new List<Face2>();
                     var selectedObjectsList = this.api.GetSelectedObjects();
 
                     if (selectedObjectsList != null) {
@@ -65,95 +67,112 @@ namespace Course {
 
                             var surface = face.IGetSurface();
                             if (surface.IsCylinder()) {
-                                var cylinder = new Cylinder(face);
-
-                                if (first == null) {
-                                    first = face;
-                                } else {
-                                    second = face;
-                                }
+                                cylinderFacesList.Add(face);
                             } else if (surface.IsPlane()) {
-                                var plane = new Plane(face);
-
-                                third = face;
+                                planeFacesList.Add(face);
                             }
                         }
                     } else {
                         Message.Info("Нет выбранных обьектов!");
                         return;
                     }
-                }
+                    {
+                        var isFits = false;
 
-                if (first != null && second != null && third != null) {
-                    var selectedFacesList = new List<Face2>() {
-                        first,
-                        second,
-                        third
-                    };
-                    var finger = new CustomUnit("Locator1");
-                    var prism = new CustomUnit("Locator2");
-                    var boss = new CustomUnit("Locator7");
-
-                    if (true) {
-                        var modelDocument = this.api.InsertComponent(finger);
-                        var componentsList = this.api.FindComponents(finger);
-                        var component = componentsList.FirstOrDefault();
-                        var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
-                        var isDone = this.api.Mate(first, targetFace, Mates.Concentric, Aligns.AntiAlign);
-                        if (true) {
-                            var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
-                            this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
-                        }
-                        var cylinder = new Cylinder(first);
-                        {
-                            this.api.SetEquation(component, new Equation() {
-                                Name = "D",
-                                Value = cylinder.Radius * 2 * 1000
-                            });
-                        }
-                        insertedComponentsList.Add(finger);
-                        isSmthChanged = true;
-                    }
-                    if (true) {
-                        var modelDocument = this.api.InsertComponent(prism);
-                        var componentsList = this.api.FindComponents(prism);
-                        var component = componentsList.FirstOrDefault();
-                        var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
-                        var isDone = this.api.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign);
-                        if (true) {
-                            var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
-
-                            this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
-                        }
-                        var cylinder = new Cylinder(second);
-                        {
-                            this.api.SetEquation(component, new Equation() {
-                                Name = "D",
-                                Value = cylinder.Radius * 2 * 1000
-                            });
-                        }
-                        insertedComponentsList.Add(prism);
-                        isSmthChanged = true;
-                    }
-                    if (true) {
-                        for (var c = 0; c < 3; c++) {
-                            var modelDocument = this.api.InsertComponent(boss);
-                            var componentsList = this.api.FindComponents(boss, c + 1);
-                            var component = componentsList.FirstOrDefault();
-                            var targetFace = this.api.FindPlaneByNormal(this.api.GetFaces(component), new Point(0, 1, 0));
-                            var isDone = this.api.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign);
-                            {
-                                this.api.SetEquation(component, new Equation() {
-                                    Name = "",
-                                    Value = 1
-                                });
+                        if (planeFacesList.Count == 1 && cylinderFacesList.Count == 2) {
+                            if (SolidWorksApi.Compare(cylinderFacesList[0], cylinderFacesList[1])) {
+                                first = cylinderFacesList[0];
+                                second = cylinderFacesList[1];
+                            } else {
+                                first = cylinderFacesList[1];
+                                second = cylinderFacesList[0];
                             }
-                            insertedComponentsList.Add(boss);
-                            isSmthChanged = true;
+                            third = planeFacesList[0];
+
+                            if (SolidWorksApi.Compare(third, first) && SolidWorksApi.Compare(third, second)) {
+                                Message.Info("Плоскость является наиболее развитой базой.");
+                                isFits = true;
+                            }
+                            if (
+                                (SolidWorksApi.Compare(first, second) && SolidWorksApi.Compare(first, third)) ||
+                                (SolidWorksApi.Compare(second, first) && SolidWorksApi.Compare(second, third))
+                            ) {
+                                Message.Error("Цилиндрическая поверхность является наиболее развитой базой!");
+                            }
+                        }
+
+                        if (isFits) {
+                            var selectedFacesList = new List<Face2>() {
+                                first,
+                                second,
+                                third
+                            };
+                            var finger = new CustomUnit("Locator1");
+                            var prism = new CustomUnit("Locator2");
+                            var boss = new CustomUnit("Locator7");
+
+                            if (true) {
+                                var modelDocument = this.api.InsertComponent(finger);
+                                var componentsList = this.api.FindComponents(finger);
+                                var component = componentsList.FirstOrDefault();
+                                var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
+                                var isDone = this.api.Mate(first, targetFace, Mates.Concentric, Aligns.AntiAlign);
+                                if (true) {
+                                    var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
+                                    this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
+                                }
+                                var cylinder = new Cylinder(first);
+                                {
+                                    this.api.SetEquation(component, new Equation() {
+                                        Name = "D",
+                                        Value = cylinder.Radius * 2 * 1000
+                                    });
+                                }
+                                insertedComponentsList.Add(finger);
+                                isSmthChanged = true;
+                            }
+                            if (true) {
+                                var modelDocument = this.api.InsertComponent(prism);
+                                var componentsList = this.api.FindComponents(prism);
+                                var component = componentsList.FirstOrDefault();
+                                var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
+                                var isDone = this.api.Mate(second, targetFace, Mates.Concentric, Aligns.AntiAlign);
+                                if (true) {
+                                    var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
+
+                                    this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
+                                }
+                                var cylinder = new Cylinder(second);
+                                {
+                                    this.api.SetEquation(component, new Equation() {
+                                        Name = "D",
+                                        Value = cylinder.Radius * 2 * 1000
+                                    });
+                                }
+                                insertedComponentsList.Add(prism);
+                                isSmthChanged = true;
+                            }
+                            if (true) {
+                                for (var c = 0; c < 3; c++) {
+                                    var modelDocument = this.api.InsertComponent(boss);
+                                    var componentsList = this.api.FindComponents(boss, c + 1);
+                                    var component = componentsList.FirstOrDefault();
+                                    var targetFace = this.api.FindPlaneByNormal(this.api.GetFaces(component), new Point(0, 1, 0));
+                                    var isDone = this.api.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign);
+                                    {
+                                        this.api.SetEquation(component, new Equation() {
+                                            Name = "",
+                                            Value = 1
+                                        });
+                                    }
+                                    insertedComponentsList.Add(boss);
+                                    isSmthChanged = true;
+                                }
+                            }
+                        } else {
+                            Message.Error("Выбранные плоскости не удовлетворяют заданию!");
                         }
                     }
-                } else {
-                    Message.Error("Выбранные плоскости не удовлетворяют заданию!");
                 }
 
                 Message.Info("Выполнение алгоритма завершено!");
