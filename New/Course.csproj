@@ -54,6 +54,7 @@
     <Compile Include="Api\Aligns.cs" />
     <Compile Include="Api\BaseSurface.cs" />
     <Compile Include="Api\Bounds.cs" />
+    <Compile Include="Api\Box.cs" />
     <Compile Include="Api\Cylinder.cs" />
     <Compile Include="Api\DocumentTypes.cs" />
     <Compile Include="Api\Equation.cs" />

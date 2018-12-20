@@ -20,6 +20,13 @@ namespace Course.Api {
         private SelectionMgr selectionManager;
         private ModelDoc2 modelDocument;
 
+        public ModelDoc2 ModelDocument {
+            get { return this.modelDocument; }
+        }
+        public AssemblyDoc AssemblyDocument {
+            get { return this.assemblyDocument; }
+        }
+
         public static SolidWorksApi GetSolidWorks()
         {
             SolidWorksApi api = null;
@@ -124,35 +131,49 @@ namespace Course.Api {
 
         public Face2 FindPlaneByParams(IEnumerable<Face2> faces, Double[] planeParams) {
             Func<Face2, Boolean> searchPredicate = (face) => {
-                var array = face.GetSurface().PlaneParams;
+                if (face != null && face.IGetSurface() != null && face.IGetSurface().IsPlane()) {
+                    var array = face.GetSurface().PlaneParams;
 
-                return this.CompareParams(planeParams, array, 6);
+                    return this.CompareParams(planeParams, array, 6);
+                } else {
+                    return false;
+                }
             };
 
             return this.FindFaces(faces, searchPredicate).FirstOrDefault();
         }
 
         public Face2 FindPlaneByNormal(IEnumerable<Face2> faces, Point normal) {
-            Func<Face2, Boolean> searchPredicate = (face) => {
-                if (face.GetSurface().IsPlane()) {
-                    Plane plane = new Plane(face);
+            Face2 face = null;
 
-                    return plane.Normal.X == normal.X &&
-                           plane.Normal.Y == normal.Y &&
-                           plane.Normal.Z == normal.Z;
+            foreach (var currFace in faces) {
+                if (currFace != null) {
+                    if (currFace.GetSurface() != null && currFace.GetSurface().IsPlane()) {
+                        Plane plane = new Plane(currFace);
+                        var isFits =  plane.Normal.X == normal.X &&
+                                      plane.Normal.Y == normal.Y &&
+                                      plane.Normal.Z == normal.Z;
+
+                        if (isFits) {
+                            face = currFace;
+                            break;
+                        }
+                    }
                 }
+            }
 
-                return false;
-            };
-
-            return this.FindFaces(faces, searchPredicate).FirstOrDefault();
+            return face;
         }
 
         public Face2 FindCylinderByParams(IEnumerable<Face2> faces, Double[] cylinderParams) {
             Func<Face2, Boolean> searchPredicate = (face) => {
-                var cylinderParamsArray = face.GetSurface().CylinderParams;
+                if (face != null && face.GetSurface() != null && face.GetSurface().IsCylinder) {
+                    var cylinderParamsArray = face.GetSurface().CylinderParams;
 
-                return this.CompareParams(cylinderParams, cylinderParamsArray, 7);
+                    return this.CompareParams(cylinderParams, cylinderParamsArray, 7);
+                } else {
+                    return false;
+                }
             };
 
             return this.FindFaces(faces, searchPredicate).FirstOrDefault();
@@ -183,7 +204,7 @@ namespace Course.Api {
                         } catch {}
 
                         if (isFounded) {
-                            equationManager.Equation[i] = String.Format("{0}{1}{0}={2}", '"', equation.Name, equation.Value);
+                            equationManager.Equation[i] = equation.ToString();
 
                             equationManager.EvaluateAll();
                             modelDocument.EditRebuild3();
@@ -267,6 +288,27 @@ namespace Course.Api {
             Double secondValue = func(second);
 
             return firstValue > secondValue;
+        }
+
+        public static Box GetBox(dynamic @object) {
+            Box box = null;
+
+            try {
+                Double[] boxParams = null;
+
+                if (@object as AssemblyDoc != null) {
+                    boxParams = (@object as AssemblyDoc).GetBox(1);
+                }
+                if (@object as Face2 != null) {
+                    boxParams = (@object as Face2).GetBox();
+                }
+
+                box = Box.FromArray(boxParams);
+            } catch {
+                Message.Error("Не удалось получить граничный короб!");
+            }
+
+            return box;
         }
 
         protected ModelDoc2 OpenDocumentByFilePathway(String filePathway, DocumentTypes documentType)

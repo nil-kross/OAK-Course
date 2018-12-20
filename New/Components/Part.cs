@@ -2,7 +2,7 @@
 
 namespace Course.Components {
     public abstract class Part : Component {
-        protected override String Dimension {
+        protected override String Extension {
             get { return "SLDPRT"; }
         }
     }

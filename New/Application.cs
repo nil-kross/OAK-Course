@@ -65,11 +65,13 @@ namespace Course {
                         foreach (var obj in selectedObjectsList) {
                             var face = obj as Face2;
 
-                            var surface = face.IGetSurface();
-                            if (surface.IsCylinder()) {
-                                cylinderFacesList.Add(face);
-                            } else if (surface.IsPlane()) {
-                                planeFacesList.Add(face);
+                            if (face != null) {
+                                var surface = face.IGetSurface();
+                                if (surface.IsCylinder()) {
+                                    cylinderFacesList.Add(face);
+                                } else if (surface.IsPlane()) {
+                                    planeFacesList.Add(face);
+                                }
                             }
                         }
                     } else {
@@ -88,6 +90,7 @@ namespace Course {
                                 second = cylinderFacesList[0];
                             }
                             third = planeFacesList[0];
+                            var pl = new Plane(third);
 
                             if (SolidWorksApi.Compare(third, first) && SolidWorksApi.Compare(third, second)) {
                                 Message.Info("Плоскость является наиболее развитой базой.");
@@ -110,9 +113,22 @@ namespace Course {
                             var finger = new CustomUnit("Locator1");
                             var prism = new CustomUnit("Locator2");
                             var boss = new CustomUnit("Locator7");
+                            var boundaryBox = SolidWorksApi.GetBox(this.api.ModelDocument);
+                            var height = (20 / 100.0) * boundaryBox.Dz;
+                            var components = new List<Component>() {
+                                finger,
+                                prism,
+                                boss,
+                                boss,
+                                boss
+                            };
+
+                            foreach (var component in components) {
+                                var modelDocument = this.api.InsertComponent(component);
+                            }
+                            Input.Key("Интерактивная пауза.." + '\n' + "[Продолжить]");
 
                             if (true) {
-                                var modelDocument = this.api.InsertComponent(finger);
                                 var componentsList = this.api.FindComponents(finger);
                                 var component = componentsList.FirstOrDefault();
                                 var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.05, 0, 0, -1, 0, 0.00999 });
@@ -121,18 +137,26 @@ namespace Course {
                                     var plane = this.api.FindPlaneByParams(this.api.GetFaces(component), new Double[6] { 0, -1, 0, 0, 0, 0 });
                                     this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                                 }
+                                var bounds = SolidWorksApi.GetBounds(first);
                                 var cylinder = new Cylinder(first);
                                 {
                                     this.api.SetEquation(component, new Equation() {
+                                        Name = "H",
+                                        Value = height
+                                    });
+                                    this.api.SetEquation(component, new Equation() {
                                         Name = "D",
-                                        Value = cylinder.Radius * 2 * 1000
+                                        Value = cylinder.Radius * 2
+                                    });
+                                    this.api.SetEquation(component, new Equation() {
+                                        Name = "L",
+                                        Value = bounds.V
                                     });
                                 }
                                 insertedComponentsList.Add(finger);
                                 isSmthChanged = true;
                             }
                             if (true) {
-                                var modelDocument = this.api.InsertComponent(prism);
                                 var componentsList = this.api.FindComponents(prism);
                                 var component = componentsList.FirstOrDefault();
                                 var targetFace = this.api.FindCylinderByParams(this.api.GetFaces(component), new Double[7] { 0, 0.021, 0, 0, -1, 0, 0.015 });
@@ -142,11 +166,20 @@ namespace Course {
 
                                     this.api.Mate(plane, third, Mates.Coincident, Aligns.AntiAlign);
                                 }
+                                var bounds = SolidWorksApi.GetBounds(second);
                                 var cylinder = new Cylinder(second);
                                 {
                                     this.api.SetEquation(component, new Equation() {
+                                        Name = "H",
+                                        Value = boundaryBox.Dz * height
+                                    });
+                                    this.api.SetEquation(component, new Equation() {
                                         Name = "D",
-                                        Value = cylinder.Radius * 2 * 1000
+                                        Value = cylinder.Radius * 2
+                                    });
+                                    this.api.SetEquation(component, new Equation() {
+                                        Name = "L",
+                                        Value = bounds.V
                                     });
                                 }
                                 insertedComponentsList.Add(prism);
@@ -154,15 +187,21 @@ namespace Course {
                             }
                             if (true) {
                                 for (var c = 0; c < 3; c++) {
-                                    var modelDocument = this.api.InsertComponent(boss);
                                     var componentsList = this.api.FindComponents(boss, c + 1);
                                     var component = componentsList.FirstOrDefault();
                                     var targetFace = this.api.FindPlaneByNormal(this.api.GetFaces(component), new Point(0, 1, 0));
                                     var isDone = this.api.Mate(third, targetFace, Mates.Coincident, Aligns.AntiAlign);
                                     {
+                                        var bounds = SolidWorksApi.GetBounds(third);
+                                        var bossDiameterValue = (20 / 100.0) * Math.Sqrt(Math.Pow(bounds.U, 2) + Math.Pow(bounds.V, 2));
+
                                         this.api.SetEquation(component, new Equation() {
-                                            Name = "",
-                                            Value = 1
+                                            Name = "H",
+                                            Value = boundaryBox.Dz * height
+                                        });
+                                        this.api.SetEquation(component, new Equation() {
+                                            Name = "D",
+                                            Value = bossDiameterValue
                                         });
                                     }
                                     insertedComponentsList.Add(boss);
